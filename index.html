@@ -1,0 +1,3643 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nataliadesiandra MUA — Schedule & Booking</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#F5F4F2;
+  --surface:#FFFFFF;
+  --ink:#000000;
+  --ink-soft:#000000;
+  --rose:#A8314A;
+  --rose-dark:#8A2740;
+  --rose-tint:#F3DDE1;
+  --gold:#C08552;
+  --gold-tint:#F1E1CF;
+  --dusk:#5E6B96;
+  --dusk-tint:#E1E4EF;
+  --taupe:#8C8072;
+  --taupe-tint:#EAE5DE;
+  --line:#E5E3E0;
+  --sage:#6F8F72;
+  --sage-tint:#E1EAE1;
+  --past-bg:#EDEDED;
+  --shadow: 0 10px 28px rgba(0,0,0,0.06);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;overflow-x:hidden;width:100%;}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+.app{
+  max-width:920px;
+  margin:0 auto;
+  padding:calc(20px + env(safe-area-inset-top)) 16px 100px;
+  box-sizing:border-box;
+}
+@media (max-width:480px){
+  .app{ padding:calc(14px + env(safe-area-inset-top)) 10px 92px; }
+}
+
+/* ---------- Header ---------- */
+.header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:22px;
+  flex-wrap:wrap;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.brand-mark{
+  width:44px;height:44px;flex:none;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--rose),var(--rose-dark));
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;
+  font-size:20px;font-weight:600;
+}
+.brand-text h1{
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;
+  font-weight:600;
+  font-size:24px;
+  margin:0;
+  line-height:1.1;
+  letter-spacing:-0.01em;
+}
+.brand-text p{
+  margin:3px 0 0;
+  font-size:12.5px;
+  color:var(--ink-soft);
+}
+.btn{
+  border:none;
+  cursor:pointer;
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;
+  font-weight:700;
+  font-size:14px;
+  padding:11px 20px;
+  border-radius:999px;
+  transition:transform .12s ease, background .15s ease, box-shadow .15s ease;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.btn:active{transform:scale(0.97);}
+.btn-primary{background:var(--rose);color:#fff;}
+.btn-primary:hover{background:var(--rose-dark);}
+.btn-ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line);}
+.btn-ghost-danger{background:transparent;color:#C0392B;border:1.5px solid #F0AEB9;}
+.btn-ghost-danger:hover{border-color:#C0392B;background:var(--rose-tint);}
+.btn-ghost:hover{border-color:var(--rose);color:var(--rose);}
+.btn-text{background:transparent;color:var(--ink-soft);padding:6px 10px;font-weight:600;font-size:13px;}
+.btn-text:hover{color:var(--rose);}
+.btn-danger{background:transparent;color:#a83232;padding:6px 10px;font-weight:600;font-size:13px;}
+.btn-danger-solid{background:#C0392B;color:#fff;}
+.btn-danger-solid:hover{background:#A5301F;}
+.app-toast{
+  position:fixed;
+  left:50%;
+  bottom:88px;
+  transform:translateX(-50%) translateY(16px);
+  background:#fff;
+  color:#000;
+  font-weight:800;
+  font-size:13.5px;
+  padding:12px 18px;
+  border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.22);
+  z-index:400;
+  opacity:0;
+  transition:opacity .25s ease, transform .25s ease;
+  max-width:88vw;
+  text-align:center;
+  pointer-events:none;
+}
+.app-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ---------- Login ---------- */
+.login-screen{
+  position:fixed;
+  inset:0;
+  background:var(--bg);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:1000;
+}
+.login-card{
+  background:#fff;
+  border-radius:22px;
+  padding:36px 28px;
+  max-width:340px;
+  width:100%;
+  box-shadow:var(--shadow);
+  text-align:center;
+}
+.login-error{
+  font-size:12.5px;
+  font-weight:800;
+  color:#000;
+  background:var(--rose-tint);
+  padding:8px 10px;
+  border-radius:8px;
+  margin-top:4px;
+  text-align:left;
+}
+.btn-danger:hover{text-decoration:underline;}
+.btn-sm{padding:8px 14px;font-size:13px;}
+.btn-block{width:100%;justify-content:center;}
+
+/* ---------- Calendar card ---------- */
+.calendar-card{
+  background:var(--surface);
+  border-radius:20px;
+  padding:20px;
+  box-shadow:var(--shadow);
+}
+.cal-toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:16px;
+}
+.cal-nav{display:flex;align-items:center;gap:10px;}
+.cal-nav button{
+  width:34px;height:34px;border-radius:50%;border:1.5px solid var(--line);
+  background:#fff;cursor:pointer;font-size:16px;color:var(--ink);
+  display:flex;align-items:center;justify-content:center;
+}
+.cal-nav button:hover{border-color:var(--rose);color:var(--rose);}
+.cal-title{
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;
+  font-size:19px;font-weight:700;
+  min-width:170px;text-align:center;
+}
+
+.cal-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:6px;
+}
+.cal-head{
+  text-align:center;
+  font-size:11.5px;
+  font-weight:700;
+  color:var(--ink-soft);
+  padding-bottom:6px;
+}
+.cal-cell{
+  border-radius:12px;
+  background:#fff;
+  border:1px solid var(--line);
+  padding:6px 4px;
+  display:flex;
+  flex-direction:column;
+  cursor:pointer;
+  transition:border-color .12s ease, background .12s ease;
+  min-height:66px;
+}
+.cal-cell:hover{border-color:var(--rose);}
+.cal-cell.faded{
+  background:transparent;
+  border-color:transparent;
+  cursor:default;
+  opacity:0.35;
+}
+.cal-cell.faded:hover{border-color:transparent;}
+.cal-cell.today{border-color:var(--rose);box-shadow:inset 0 0 0 1px var(--rose);}
+.cal-cell.past{background:var(--past-bg);}
+.cal-cell.past:hover{border-color:var(--line);}
+.cal-daynum{font-size:13px;font-weight:700;}
+.cal-bookings{margin-top:2px;display:flex;flex-direction:column;gap:1px;overflow:hidden;flex:1;}
+.cal-booking-name{
+  font-size:10px;
+  font-weight:800;
+  line-height:1.3;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.cal-booking-more{font-size:9px;font-weight:800;color:#000;margin-top:1px;}
+
+.empty-hint{
+  text-align:center;
+  color:var(--ink-soft);
+  font-size:13px;
+  padding:30px 10px 6px;
+}
+
+/* ---------- Summary card ---------- */
+.summary-card{
+  background:var(--surface);
+  border-radius:20px;
+  padding:20px;
+  box-shadow:var(--shadow);
+  margin-top:16px;
+}
+.summary-title{
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;
+  font-weight:600;
+  font-size:17px;
+  margin:0 0 14px;
+}
+.summary-day{margin-bottom:14px;}
+.summary-day:last-child{margin-bottom:0;}
+.summary-day-head{
+  display:flex;
+  align-items:baseline;
+  gap:8px;
+  cursor:pointer;
+  margin-bottom:8px;
+  padding-bottom:6px;
+  border-bottom:1px solid var(--line);
+}
+.summary-day-label{font-weight:800;font-size:13.5px;color:var(--ink);}
+.summary-day-date{font-size:12px;color:var(--ink-soft);}
+.summary-day-count{
+  margin-left:auto;font-size:11.5px;color:var(--ink-soft);
+}
+.summary-empty{font-size:12.5px;color:var(--ink-soft);font-style:italic;padding:2px 0 2px;}
+.summary-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:8px 6px;
+  border-radius:10px;
+  cursor:pointer;
+}
+.summary-item:hover{background:var(--bg);}
+.mini-dot{width:9px;height:9px;border-radius:50%;flex:none;}
+.summary-item-text{flex:1;min-width:0;}
+.si-name{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.si-sub{font-size:11.5px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.si-price{font-size:12.5px;font-weight:800;color:var(--ink);flex:none;}
+
+/* ---------- Modal ---------- */
+.overlay{
+  position:fixed;inset:0;
+  background:rgba(46,31,39,0.45);
+  display:flex;align-items:center;justify-content:center;
+  padding:16px;
+  z-index:50;
+  animation:fade .15s ease;
+}
+@keyframes fade{from{opacity:0;}to{opacity:1;}}
+.modal{
+  background:#fff;
+  border-radius:18px;
+  width:100%;
+  max-height:88vh;
+  overflow-y:auto;
+  box-shadow:0 30px 80px rgba(46,31,39,0.35);
+  animation:pop .16s ease;
+}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(0.98);}to{opacity:1;transform:none;}}
+.modal.w-sm{max-width:440px;}
+.modal.w-md{max-width:540px;}
+.modal.w-lg{max-width:600px;}
+.modal-head{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  padding:22px 22px 6px;
+}
+.modal-head h2{
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-weight:600;font-size:19px;margin:0;
+}
+.modal-head .sub{font-size:12.5px;color:var(--ink-soft);margin-top:3px;}
+.modal-close{
+  background:none;border:none;cursor:pointer;font-size:20px;color:var(--ink-soft);
+  line-height:1;padding:4px;
+}
+.modal-close:hover{color:var(--rose);}
+.modal-body{padding:14px 22px 22px;}
+
+/* ---------- Form ---------- */
+.field{margin-bottom:14px;}
+.field label{
+  display:block;font-size:12.5px;font-weight:700;color:var(--ink-soft);
+  margin-bottom:6px;
+}
+.field-hint{margin-top:6px;font-size:12.5px;font-weight:800;color:#000;}
+.field-error-msg{margin-top:5px;font-size:12px;font-weight:700;color:#C0392B;}
+.field-error{border-color:#C0392B !important;}
+.toggle-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:11px 0;
+}
+.toggle-label{font-size:13px;font-weight:700;color:#000;}
+.switch{position:relative;display:inline-block;width:46px;height:27px;flex:none;}
+.switch input{opacity:0;width:0;height:0;}
+.switch-slider{
+  position:absolute;cursor:pointer;inset:0;
+  background:var(--line);
+  border-radius:999px;
+  transition:.2s;
+}
+.switch-slider::before{
+  content:'';
+  position:absolute;
+  height:21px;width:21px;
+  left:3px;bottom:3px;
+  background:#fff;
+  border-radius:50%;
+  transition:.2s;
+  box-shadow:0 1px 3px rgba(0,0,0,0.3);
+}
+.switch input:checked + .switch-slider{background:var(--rose);}
+.switch input:checked + .switch-slider::before{transform:translateX(19px);}
+.field input[type=text], .field input[type=tel], .field input[type=date],
+.field input[type=number], .field input[type=password], .field input[type=time],
+.field select, .field textarea{
+  width:100%;
+  padding:12px 14px;
+  border-radius:12px;
+  border:1.5px solid var(--line);
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;
+  font-size:15px;
+  color:var(--ink);
+  background:#F7F6F5;
+  transition:border-color .15s ease, background .15s ease;
+}
+.field input:focus, .field select:focus, .field textarea:focus{
+  outline:none;border-color:var(--rose);background:#fff;
+}
+.field textarea{resize:vertical;min-height:64px;}
+.phone-input-group{
+  display:flex;align-items:center;
+  border:1.5px solid var(--line);
+  border-radius:10px;
+  overflow:hidden;
+}
+.phone-prefix{
+  padding:10px 0 10px 12px;
+  font-size:14px;font-weight:700;color:var(--ink);
+  background:#fff;
+}
+.phone-input-group input{
+  border:none !important;
+  flex:1;
+  padding:10px 12px 10px 4px !important;
+}
+.phone-input-group input:focus{outline:none;}
+.phone-input-group:focus-within{border-color:var(--rose);}
+.password-input-group{position:relative;display:flex;align-items:center;}
+.password-input-group input{width:100%;padding-right:44px !important;}
+.password-toggle-btn{
+  position:absolute;
+  right:6px;
+  background:none;
+  border:none;
+  cursor:pointer;
+  padding:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#000;
+}
+.password-toggle-btn .eye-icon{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.8;}
+.password-toggle-btn.showing{color:var(--rose);}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.segmented{display:flex;flex-wrap:wrap;gap:8px;}
+.seg-btn{
+  border:1.5px solid var(--line);
+  background:#fff;
+  border-radius:10px;
+  padding:8px 12px;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+  color:var(--ink-soft);
+}
+.seg-btn.active{color:var(--ink);border-width:1.5px;}
+.form-actions{display:flex;gap:10px;margin-top:18px;}
+.hr{height:1px;background:var(--line);border:none;margin:16px 0;}
+
+/* ---------- Booking card (day detail) ---------- */
+.booking-card{
+  border:1.5px solid var(--line);
+  border-radius:14px;
+  padding:14px 16px;
+  margin-bottom:12px;
+}
+.bc-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+.badge{
+  font-size:11.5px;font-weight:800;padding:4px 10px;border-radius:6px;color:#fff;
+}
+.bc-name{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-size:16px;font-weight:800;margin:2px 0 8px;color:#000;}
+.bc-rows{display:grid;grid-template-columns:auto 12px 1fr;gap-x:0;gap-y:4px;font-size:13px;font-weight:700;color:#000;margin-bottom:2px;}
+.bc-label{font-weight:800;color:#000;white-space:nowrap;padding-right:4px;}
+.bc-colon{color:#000;font-weight:800;}
+.bc-val{color:#000;word-break:break-word;}
+.bc-price{
+  margin-top:8px;padding-top:10px;border-top:1px dashed var(--line);
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;
+}
+.bc-price .amount{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-size:17px;font-weight:800;color:#000;}
+.pay-tag{font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:6px;color:#000;}
+.pay-tag.lunas{background:var(--sage-tint);}
+.pay-tag.deposit{background:var(--rose-tint);}
+.pay-tag.none{background:var(--taupe-tint);color:#000;}
+.bc-note{margin-top:8px;font-size:13px;color:#000;font-weight:700;font-style:italic;}
+.bc-remaining{
+  margin-top:8px;
+  display:inline-block;
+  font-size:12.5px;
+  font-weight:800;
+  color:#000;
+  background:var(--rose-tint);
+  padding:5px 10px;
+  border-radius:7px;
+  border:none;
+  cursor:pointer;
+  font-family:inherit;
+}
+.bc-remaining:active{opacity:0.85;}
+.bc-paid-full{margin-top:8px;display:inline-block;font-size:12.5px;font-weight:800;color:#000;background:var(--sage-tint);padding:5px 10px;border-radius:7px;}
+.bc-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
+.bc-done-btn{margin-top:10px;}
+.bc-done-badge{
+  margin-top:10px;
+  text-align:center;
+  font-size:12.5px;
+  font-weight:800;
+  color:#000;
+  background:var(--sage-tint);
+  padding:8px;
+  border-radius:9px;
+}
+.bc-done-blocked{
+  margin-top:10px;
+  text-align:center;
+  font-size:12px;
+  font-weight:800;
+  color:#000;
+  background:var(--rose-tint);
+  padding:8px;
+  border-radius:9px;
+}
+
+/* ---------- Bookings list view ---------- */
+.list-card{
+  background:var(--surface);
+  border-radius:20px;
+  padding:16px;
+  box-shadow:var(--shadow);
+}
+.filter-chips{display:flex;gap:8px;flex-wrap:wrap;}
+.filter-chip{
+  border:1.5px solid var(--line);
+  background:#fff;
+  border-radius:999px;
+  padding:7px 14px;
+  font-size:12.5px;
+  font-weight:700;
+  cursor:pointer;
+  color:var(--ink-soft);
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;
+}
+.filter-chip.active{color:var(--ink);}
+.list-date-group{margin-top:18px;}
+.list-date-group:first-child{margin-top:0;}
+.list-date-head{
+  font-size:12.5px;
+  font-weight:800;
+  color:var(--ink-soft);
+  margin-bottom:8px;
+  padding-left:2px;
+}
+
+/* ---------- Report view ---------- */
+.report-stats{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap;}
+.stat-card{
+  flex:1;
+  min-width:130px;
+  background:var(--surface);
+  border-radius:16px;
+  padding:16px;
+  box-shadow:var(--shadow);
+}
+.stat-label{font-size:11.5px;color:var(--ink-soft);font-weight:700;}
+.stat-value{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-size:21px;font-weight:600;margin-top:5px;}
+.stat-value.rose{color:var(--rose);}
+.breakdown-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 0;
+  border-bottom:1px solid var(--line);
+}
+.breakdown-row:last-child{border-bottom:none;}
+.breakdown-dot{width:9px;height:9px;border-radius:50%;flex:none;}
+.breakdown-label{font-size:13.5px;font-weight:700;color:#000;flex:1;}
+.breakdown-count{font-size:14px;font-weight:800;color:#000;}
+.finance-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:9px 0;
+  border-bottom:1px solid var(--line);
+  font-size:13.5px;
+  font-weight:700;
+  color:#000;
+}
+.finance-row:last-child{border-bottom:none;}
+.finance-row b{font-weight:800;}
+.finance-total{
+  margin-top:6px;
+  padding-top:14px;
+  border-top:2px solid #000;
+  font-size:15px;
+}
+.finance-total b{font-size:18px;}
+.finance-total.finance-negative{
+  background:var(--rose-tint);
+  margin:6px -16px -4px;
+  padding:14px 16px 16px;
+  border-radius:0 0 16px 16px;
+  border-top:2px solid var(--rose);
+}
+.finance-note{
+  font-size:12px;
+  font-weight:700;
+  color:#000;
+  background:var(--bg);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:10px 12px;
+  margin-bottom:12px;
+  line-height:1.5;
+}
+
+/* ---------- Content view ---------- */
+.content-filter-select{
+  width:100%;
+  padding:10px 12px;
+  border-radius:10px;
+  border:1.5px solid var(--line);
+  font-size:14px;
+  font-weight:600;
+  color:var(--ink);
+  background:#fff;
+  font-family:inherit;
+}
+.content-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:13px 4px;
+  border-bottom:1px solid var(--line);
+}
+.content-row:last-child{border-bottom:none;}
+.content-row-left{flex:1;min-width:0;}
+.content-name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.history-cancelled-tag{
+  display:inline-block;
+  font-size:10px;
+  font-weight:800;
+  color:#000;
+  background:var(--rose-tint);
+  padding:2px 7px;
+  border-radius:5px;
+  margin-left:4px;
+  vertical-align:middle;
+}
+.history-cancel-reason{
+  font-size:11.5px;
+  font-weight:700;
+  font-style:italic;
+  color:#000;
+  margin-top:3px;
+}
+.content-pkg{font-size:12px;font-weight:600;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.history-date{font-size:11.5px;font-weight:700;color:#000;margin-top:2px;}
+.content-status-select{
+  flex:none;
+  border:1.5px solid var(--line);
+  border-radius:8px;
+  padding:7px 8px;
+  font-size:12px;
+  font-weight:700;
+  color:#000;
+  background:#fff;
+  max-width:150px;
+}
+.content-alert{
+  margin-bottom:14px;
+  padding:14px 16px;
+  border-radius:14px;
+  background:#FCE4E8;
+  border:1px solid #F0AEB9;
+  display:none;
+}
+.content-alert strong{font-size:13.5px;display:block;margin-bottom:4px;color:#000;}
+.content-alert-names{font-size:12.5px;color:#000;line-height:1.4;}
+
+/* ---------- Profile view ---------- */
+.profile-hero{
+  background:linear-gradient(150deg, var(--rose), var(--rose-dark) 75%);
+  border-radius:26px;
+  padding:40px 20px 30px;
+  text-align:center;
+  box-shadow:0 16px 34px rgba(168,49,74,0.28);
+  position:relative;
+  overflow:hidden;
+}
+.profile-hero::before{
+  content:'';
+  position:absolute;
+  top:-60px; right:-60px;
+  width:180px; height:180px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.08);
+}
+.profile-hero::after{
+  content:'';
+  position:absolute;
+  bottom:-70px; left:-40px;
+  width:160px; height:160px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.06);
+}
+.profile-avatar{
+  width:104px;height:104px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.25);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  overflow:hidden;
+  border:3px solid #fff;
+  box-shadow:0 6px 18px rgba(0,0,0,0.2);
+  margin:0 auto;
+  position:relative;
+  z-index:1;
+}
+.profile-avatar img{width:100%;height:100%;object-fit:cover;}
+.profile-avatar span{
+  color:#fff;font-size:38px;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;
+}
+.profile-hero-name{
+  margin-top:16px;
+  font-size:19px;
+  font-weight:800;
+  color:#fff;
+  position:relative;
+  z-index:1;
+}
+.profile-ig-badge{
+  margin-top:10px;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:13px;
+  font-weight:700;
+  color:#fff;
+  text-decoration:none;
+  padding:7px 14px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.18);
+  border:1px solid rgba(255,255,255,0.35);
+  position:relative;
+  z-index:1;
+}
+.profile-ig-badge svg{stroke:#fff;fill:none;stroke-width:1.8;}
+.profile-hero-hint{
+  margin-top:12px;
+  font-size:11px;
+  font-weight:700;
+  color:rgba(255,255,255,0.85);
+  position:relative;
+  z-index:1;
+}
+.profile-settings{padding:4px 16px;}
+.settings-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:14px 0;
+  border-bottom:1px solid var(--line);
+  width:100%;
+  background:none;
+  border-left:none;border-right:none;border-top:none;
+  text-align:left;
+  font-family:inherit;
+}
+.settings-row:last-child{border-bottom:none;}
+.settings-row-btn{cursor:pointer;}
+.settings-row-icon{
+  width:34px;height:34px;
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  flex:none;
+}
+.settings-row-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;}
+.settings-row-text{flex:1;min-width:0;}
+.settings-row-label{font-size:14px;font-weight:700;color:#000;}
+.settings-row-value{font-size:13.5px;font-weight:800;color:#000;}
+.settings-row-chevron{font-size:19px;color:#000;font-weight:700;}
+.preview-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+  padding:10px 0;
+  border-bottom:1px solid var(--line);
+}
+.preview-row:last-child{border-bottom:none;}
+.preview-label{font-size:12.5px;font-weight:700;color:#000;flex:none;width:42%;}
+.preview-value{font-size:13px;font-weight:800;color:#000;text-align:right;flex:1;word-break:break-word;}
+
+/* ---------- Bottom nav ---------- */
+.bottom-nav{
+  position:fixed;
+  left:0;right:0;bottom:0;
+  background:#fff;
+  border-top:1px solid var(--line);
+  display:flex;
+  justify-content:space-around;
+  gap:2px;
+  padding:8px calc(6px + env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) calc(6px + env(safe-area-inset-left));
+  z-index:40;
+}
+.nav-btn{
+  background:none;
+  border:none;
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:3px;
+  padding:6px 8px;
+  border-radius:14px;
+  color:var(--ink-soft);
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;
+  font-size:10.5px;
+  font-weight:700;
+  flex:1;
+  min-width:0;
+}
+.nav-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;}
+.nav-btn.active{color:var(--rose);}
+.nav-btn.active svg{stroke:var(--rose);}
+
+/* ---------- Invoice sheet ---------- */
+.inv-sheet{
+  background:#fff;border:1px solid var(--line);border-radius:12px;
+  padding:26px 24px;
+}
+.inv-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;}
+.inv-brand{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-size:20px;font-weight:600;}
+.inv-brand-sub{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+.inv-meta{text-align:right;font-size:12.5px;color:var(--ink-soft);}
+.inv-meta b{color:var(--ink);}
+.inv-hr{height:1px;background:var(--line);margin:16px 0;}
+.inv-block-label{font-size:11px;font-weight:800;color:var(--ink-soft);margin-bottom:6px;}
+.inv-table{width:100%;border-collapse:collapse;margin-top:14px;}
+.inv-table td{padding:9px 0;font-size:14px;border-bottom:1px solid var(--line);}
+.inv-table tr:last-child td{border-bottom:none;}
+.inv-table td.r{text-align:right;font-weight:700;}
+.inv-total{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:14px;border-top:2px solid var(--ink);}
+.inv-total .label{font-weight:700;font-size:14px;}
+.inv-total .amount{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-size:22px;font-weight:600;}
+.inv-paid-full-badge{
+  margin-top:4px;
+  text-align:right;
+  font-size:13px;
+  font-weight:800;
+  color:#1E7A34;
+  letter-spacing:0.03em;
+}
+.inv-note{margin-top:18px;font-size:12px;color:var(--ink-soft);text-align:center;}
+.inv-bank{
+  margin-top:16px;
+  padding:12px 14px;
+  border-radius:10px;
+  background:var(--bg);
+  border:1px solid var(--line);
+}
+.inv-bank-label{font-size:10.5px;font-weight:800;color:var(--ink-soft);margin-bottom:4px;}
+.inv-bank-line{font-size:13px;font-weight:600;color:var(--ink);line-height:1.5;}
+
+@media (max-width:560px){
+  .row2{grid-template-columns:1fr;}
+  .cal-title{min-width:auto;font-size:18px;}
+  .brand-text h1{font-size:20px;}
+  .inv-meta{text-align:left;}
+  .inv-top{flex-direction:column;}
+}
+@media (max-width:480px){
+  .calendar-card{padding:14px 10px;border-radius:16px;}
+  .cal-toolbar{margin-bottom:12px;}
+  .cal-nav{gap:6px;}
+  .cal-nav button{width:30px;height:30px;font-size:15px;}
+  .cal-grid{gap:4px;}
+  .cal-head{font-size:10px;padding-bottom:4px;}
+  .cal-cell{border-radius:9px;padding:4px 3px;min-height:54px;}
+  .cal-daynum{font-size:11.5px;}
+  .cal-booking-name{font-size:8.5px;}
+  .cal-booking-more{font-size:7.5px;}
+  .brand-mark{width:38px;height:38px;font-size:19px;}
+  .brand-text h1{font-size:18px;}
+  .brand-text p{font-size:11.5px;}
+  .btn-primary{padding:10px 16px;font-size:13.5px;}
+  .summary-card{padding:14px 12px;border-radius:16px;}
+  .summary-title{font-size:15.5px;}
+  .list-card{padding:12px;border-radius:16px;}
+  .finance-total.finance-negative{margin:6px -12px -4px;padding:14px 12px 16px;}
+  .filter-chip{padding:6px 12px;font-size:11.5px;}
+  .nav-btn{padding:6px 4px;font-size:9.5px;}
+  .nav-btn svg{width:20px;height:20px;}
+}
+</style>
+</head>
+<body>
+
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <div class="brand-mark" style="width:64px;height:64px;font-size:28px;margin:0 auto 18px;">N</div>
+    <h2 style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-size:20px;font-weight:800;color:#000;margin:0 0 4px;">Nataliadesiandra MUA</h2>
+
+    <div id="loginView">
+      <p style="font-size:12.5px;font-weight:700;color:#000;margin:0 0 24px;">Sign in to continue</p>
+      <form id="loginForm" onsubmit="return attemptLogin(event)">
+        <div class="field" style="text-align:left;">
+          <label>User ID</label>
+          <input type="text" id="loginUser" autocomplete="username" required>
+        </div>
+        <div class="field" style="text-align:left;">
+          <label>Password</label>
+          <div class="password-input-group">
+            <input type="password" id="loginPass" autocomplete="current-password" required>
+            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('loginPass', this)" aria-label="Show password">
+              <svg class="eye-icon" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div id="loginError" class="login-error" style="display:none;">Incorrect User ID or password.</div>
+        <button type="submit" id="loginSubmitBtn" class="btn btn-primary btn-block" style="margin-top:6px;">Login</button>
+      </form>
+      <button type="button" id="goToSignupBtn" class="btn btn-text" style="margin-top:14px;" onclick="showSignupView()">Don't have an account? Create one</button>
+    </div>
+
+    <div id="signupView" style="display:none;">
+      <p style="font-size:12.5px;font-weight:700;color:#000;margin:0 0 24px;">Create your account</p>
+      <form id="signupForm" onsubmit="return attemptSignup(event)">
+        <div class="field" style="text-align:left;">
+          <label>Choose a User ID</label>
+          <input type="text" id="signupUser" autocomplete="username" required>
+        </div>
+        <div class="field" style="text-align:left;">
+          <label>Choose a Password</label>
+          <div class="password-input-group">
+            <input type="password" id="signupPass" autocomplete="new-password" required>
+            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('signupPass', this)" aria-label="Show password">
+              <svg class="eye-icon" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="field" style="text-align:left;">
+          <label>Confirm Password</label>
+          <div class="password-input-group">
+            <input type="password" id="signupPassConfirm" autocomplete="new-password" required>
+            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('signupPassConfirm', this)" aria-label="Show password">
+              <svg class="eye-icon" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div id="signupError" class="login-error" style="display:none;"></div>
+        <button type="submit" id="signupSubmitBtn" class="btn btn-primary btn-block" style="margin-top:6px;">Create Account</button>
+      </form>
+      <button type="button" id="goToLoginBtn" class="btn btn-text" style="margin-top:14px;" onclick="showLoginView()">Already have an account? Log in</button>
+    </div>
+  </div>
+</div>
+
+<div id="appRoot" style="display:none;">
+<div class="app">
+  <div id="viewHome">
+  <div class="header">
+    <div class="brand">
+      <div class="brand-mark">N</div>
+      <div class="brand-text">
+        <h1>Nataliadesiandra MUA</h1>
+        <p>Schedule &amp; client bookings</p>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="openAddBookingChoice()">+ New Booking</button>
+  </div>
+
+  <div class="calendar-card">
+    <div class="cal-toolbar">
+      <div class="cal-nav">
+        <button onclick="changeMonth(-1)" aria-label="Previous month">‹</button>
+        <div class="cal-title" id="calTitle"></div>
+        <button onclick="changeMonth(1)" aria-label="Next month">›</button>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="goToday()">Today</button>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div class="empty-hint" id="loadingHint">Loading booking data…</div>
+  </div>
+
+  <div class="summary-card">
+    <h3 class="summary-title">Bookings for the Next 3 Days</h3>
+    <div id="summaryList"></div>
+  </div>
+  </div>
+
+  <div id="viewBookings" style="display:none;">
+    <div class="header">
+      <div class="brand">
+        <div class="brand-mark">N</div>
+        <div class="brand-text">
+          <h1>All Bookings</h1>
+          <p>Sorted by date</p>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="openAddBookingChoice()">+ New Booking</button>
+    </div>
+
+    <button type="button" class="btn btn-ghost btn-block" id="bookingHistoryBtn" style="margin-bottom:14px;" onclick="openBookingHistory()">Booking History</button>
+
+    <div class="list-card">
+      <div class="field" style="margin:0 0 14px;">
+        <label>Filter by Month</label>
+        <select class="content-filter-select" id="bookingsMonthSelect" onchange="onBookingsMonthChange(this)"></select>
+      </div>
+      <div class="field" style="margin:0;">
+        <label>Filter by Payment Stage</label>
+        <select class="content-filter-select" id="filterChips" onchange="setFilter(this.value)"></select>
+      </div>
+    </div>
+    <div id="bookingsListContainer" style="margin-top:14px;"></div>
+  </div>
+
+  <div id="viewReport" style="display:none;">
+    <div class="header">
+      <div class="brand">
+        <div class="brand-mark">N</div>
+        <div class="brand-text">
+          <h1>Report</h1>
+          <p>Booking & revenue summary</p>
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary" onclick="exportReportToExcel()">Export</button>
+    </div>
+
+    <div class="list-card">
+      <div class="filter-chips" id="reportFilterChips"></div>
+    </div>
+    <div class="report-stats" id="reportStats"></div>
+    <div class="list-card" id="reportBreakdownCard" style="margin-top:14px;"></div>
+
+    <div id="reportListContainer" style="margin-top:14px;"></div>
+    <div class="list-card" id="reportPieCard" style="margin-top:14px;display:none;">
+      <div class="stat-label" style="margin-bottom:12px;">Package Sales Breakdown</div>
+      <canvas id="reportPieChart" style="max-width:100%;display:block;margin:0 auto;"></canvas>
+      <div id="reportPieLegend" style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;"></div>
+    </div>
+  </div>
+
+  <div id="viewContent" style="display:none;">
+    <div class="header">
+      <div class="brand">
+        <div class="brand-mark">N</div>
+        <div class="brand-text">
+          <h1>Content</h1>
+          <p>Track booking content status</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-alert" id="contentAlertBanner"></div>
+
+    <div class="list-card">
+      <div class="field" style="margin:0 0 14px;">
+        <label>Filter by Month</label>
+        <select class="content-filter-select" id="contentMonthSelect" onchange="onContentMonthChange(this)"></select>
+      </div>
+      <div class="field" style="margin:0;">
+        <label>Filter by Status</label>
+        <div class="filter-chips" id="contentStatusChips"></div>
+      </div>
+    </div>
+
+    <div id="contentListContainer" style="margin-top:14px;"></div>
+  </div>
+
+  <div id="viewProfile" style="display:none;">
+    <div class="profile-hero">
+      <div class="profile-avatar" id="profileAvatar" onclick="triggerProfilePhotoUpload()">
+        <span id="profileAvatarInitial">N</span>
+      </div>
+      <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="handleProfilePhotoUpload(event)">
+      <div class="profile-hero-name">Nataliadesiandra MUA</div>
+      <a class="profile-ig-badge" href="https://instagram.com/nataliadesiandramua" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" width="14" height="14"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.2" cy="6.8" r="0.9" fill="currentColor" stroke="none"/></svg>
+        @nataliadesiandramua
+      </a>
+      <p class="profile-hero-hint">Tap the photo to change it</p>
+    </div>
+
+    <div class="list-card profile-settings" style="margin-top:16px;">
+      <div class="settings-row">
+        <div class="settings-row-icon" style="background:var(--rose-tint);color:var(--rose-dark);">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2"/><path d="M5 19c1.2-3.4 3.6-5 7-5s5.8 1.6 7 5"/></svg>
+        </div>
+        <div class="settings-row-text"><div class="settings-row-label">User ID</div></div>
+        <div class="settings-row-value" id="profileUsernameDisplay">-</div>
+      </div>
+      <button type="button" class="settings-row settings-row-btn" onclick="openChangePasswordModal()">
+        <div class="settings-row-icon" style="background:var(--dusk-tint);color:var(--dusk);">
+          <svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="9" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+        </div>
+        <div class="settings-row-text"><div class="settings-row-label">Change Password</div></div>
+        <span class="settings-row-chevron">›</span>
+      </button>
+      <button type="button" class="settings-row settings-row-btn" onclick="confirmLogout()">
+        <div class="settings-row-icon" style="background:#FBD9E1;color:#C0392B;">
+          <svg viewBox="0 0 24 24"><path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3"/><path d="M15 8l4 4-4 4"/><path d="M19 12H9"/></svg>
+        </div>
+        <div class="settings-row-text"><div class="settings-row-label" style="color:#C0392B;">Log Out</div></div>
+        <span class="settings-row-chevron">›</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="navHome" onclick="switchView('home')">
+    <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+    <span>Home</span>
+  </button>
+  <button class="nav-btn" id="navBookings" onclick="switchView('bookings')">
+    <svg viewBox="0 0 24 24">
+      <rect x="2.5" y="5" width="14" height="15" rx="2.5"/>
+      <path d="M6.5 3v4M14 3v4"/>
+      <path d="M2.5 10h13"/>
+      <rect x="5" y="12.6" width="2.1" height="2.1" rx="0.4" fill="currentColor" stroke="none"/>
+      <rect x="8.8" y="12.6" width="2.1" height="2.1" rx="0.4" fill="currentColor" stroke="none"/>
+      <rect x="5" y="16.1" width="2.1" height="2.1" rx="0.4" fill="currentColor" stroke="none"/>
+      <circle cx="18" cy="17.5" r="5" fill="#fff"/>
+      <path d="M15.8 17.6l1.4 1.4 2.7-2.7" fill="none"/>
+    </svg>
+    <span>Bookings</span>
+  </button>
+  <button class="nav-btn" id="navReport" onclick="switchView('report')">
+    <svg viewBox="0 0 24 24">
+      <path d="M7 3h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/>
+      <path d="M14 3v4h4"/>
+      <path d="M9 9h6M9 11.5h6M9 14h4"/>
+      <rect x="8" y="17" width="1.7" height="2" fill="currentColor" stroke="none"/>
+      <rect x="10.3" y="15.5" width="1.7" height="3.5" fill="currentColor" stroke="none"/>
+      <rect x="12.6" y="14" width="1.7" height="5" fill="currentColor" stroke="none"/>
+      <rect x="14.9" y="12.5" width="1.7" height="6.5" fill="currentColor" stroke="none"/>
+    </svg>
+    <span>Report</span>
+  </button>
+  <button class="nav-btn" id="navContent" onclick="switchView('content')">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.2" cy="6.8" r="0.9" fill="currentColor" stroke="none"/></svg>
+    <span>Content</span>
+  </button>
+  <button class="nav-btn" id="navProfile" onclick="switchView('profile')">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c1.4-4 4.2-6 7.5-6s6.1 2 7.5 6"/></svg>
+    <span>Profile</span>
+  </button>
+</nav>
+
+<div id="modalRoot"></div>
+</div>
+
+<script>
+/* ================= CONFIG ================= */
+const PACKAGES = {
+  'Diamond Wedding':    { label: 'Diamond Wedding',    color: '#5E6B96', tint: '#E1E4EF' },
+  'Signature Wedding':  { label: 'Signature Wedding',  color: '#A8314A', tint: '#F3DDE1' },
+  'Engagement':         { label: 'Engagement',         color: '#C9A227', tint: '#F5ECC9' },
+  'Pre-Wedding':        { label: 'Pre-Wedding',        color: '#C77B95', tint: '#F6E1E8' },
+  'Sweet 17':           { label: 'Sweet 17',           color: '#9B72CF', tint: '#EBE0F7' },
+  'Party':              { label: 'Party',              color: '#D6813F', tint: '#F6E2CE' },
+  'Graduation':         { label: 'Graduation',         color: '#3F7FBF', tint: '#DCEAF7' },
+  'Special Occasion':   { label: 'Special Occasion',   color: '#4E8B87', tint: '#DCEEEC' },
+  'Family Wedding':     { label: 'Family Wedding',     color: '#8C7256', tint: '#EEE6DA' },
+  'Indoor Photoshoot':  { label: 'Indoor Photoshoot',  color: '#6B7280', tint: '#E4E5E8' },
+  'Wedding Trial':      { label: 'Wedding Trial',      color: '#6F8F72', tint: '#E1EAE1' },
+  'Others':             { label: 'Others',             color: '#8C8072', tint: '#EAE5DE' },
+};
+const DEPOSIT_STAGES = ['Deposit 1', 'Deposit 2', 'Full Payment'];
+const CONTENT_STATUSES = ['No content yet', 'Editing content', 'Content Posted', 'No Post'];
+const CONTENT_STATUS_STYLES = {
+  'No content yet': { bg: '#FBD9E1', border: '#D46A85' },
+  'Editing content': { bg: '#D9E6FB', border: '#5C87C9' },
+  'Content Posted': { bg: '#E4E4E4', border: '#9B9B9B' },
+  'No Post': { bg: '#EAE5DE', border: '#8C8072' },
+};
+const MONTHS_ID = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS_ID = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const FULL_DAYS_ID = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+/* ================= STATE ================= */
+let bookings = [];
+let today = new Date();
+let viewYear = today.getFullYear();
+let viewMonth = today.getMonth();
+let dataLoaded = false;
+let currentView = 'home';
+let activeFilter = 'All';
+let bookingsMonthFilter = 'all';
+let reportFilter = 'all';
+let contentMonthFilter = 'all';
+let contentStatusFilter = 'all';
+let reportMonthFilter = 'all';
+
+/* ================= STORAGE ================= */
+const storageAvailable = typeof window !== 'undefined'
+  && window.storage
+  && typeof window.storage.get === 'function'
+  && typeof window.storage.set === 'function';
+let storageWarned = false;
+
+function showStorageWarning(){
+  if(storageWarned) return;
+  storageWarned = true;
+  const hint = document.getElementById('loadingHint');
+  if(hint){
+    hint.textContent = 'Automatic saving is not available in this view. You can still create bookings, but they will only stay for this session.';
+    hint.style.display = 'block';
+    hint.style.color = 'var(--rose)';
+  }
+}
+
+async function loadBookings(){
+  if(!storageAvailable){
+    bookings = [];
+    dataLoaded = true;
+    showStorageWarning();
+    return;
+  }
+  try{
+    const res = await window.storage.get('bookings', false);
+    if(res && res.value) bookings = JSON.parse(res.value);
+    else bookings = [];
+  }catch(e){
+    bookings = [];
+  }
+  migrateLegacyPackageNames();
+  dataLoaded = true;
+}
+
+function migrateLegacyPackageNames(){
+  let changed = false;
+  const legacyMap = { 'Wisuda': 'Graduation', 'Bride': 'Signature Wedding' };
+  bookings.forEach(b => {
+    if(legacyMap[b.package]){
+      b.package = legacyMap[b.package];
+      changed = true;
+    }
+    if(!PACKAGES[b.package]){
+      b.package = 'Others';
+      changed = true;
+    }
+  });
+  if(changed) persistBookings();
+}
+async function persistBookings(){
+  if(!storageAvailable){
+    showStorageWarning();
+    return;
+  }
+  try{
+    await window.storage.set('bookings', JSON.stringify(bookings), false);
+  }catch(e){
+    if(!storageWarned) console.error('Gagal menyimpan data', e);
+    showStorageWarning();
+  }
+}
+
+/* ================= HELPERS ================= */
+function uid(){ return 'b_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function pad(n){ return String(n).padStart(2,'0'); }
+function toDateStr(y,m,d){ return `${y}-${pad(m+1)}-${pad(d)}`; }
+function formatRupiah(n){
+  if(n === null || n === undefined || n === '') return '-';
+  const num = Number(n);
+  const sign = num < 0 ? '-' : '';
+  return sign + 'Rp' + Math.abs(num).toLocaleString('id-ID');
+}
+function groupThousands(n){
+  if(n === null || n === undefined || n === '') return '';
+  const raw = String(n).replace(/[^0-9]/g, '');
+  return raw ? Number(raw).toLocaleString('en-US') : '';
+}
+function formatThousands(el){
+  const raw = el.value.replace(/[^0-9]/g, '');
+  el.value = raw ? Number(raw).toLocaleString('en-US') : '';
+}
+function recheckFullPaymentStage(){
+  const stageSel = document.getElementById('f_depositStage');
+  const depositEl = document.getElementById('f_depositAmount');
+  if(!stageSel || !depositEl) return;
+
+  const depositVal = Number(depositEl.value.replace(/[^0-9]/g, '')) || 0;
+  const totalDue = getFormTotalDue();
+
+  if(depositVal > 0 && totalDue > 0 && depositVal === totalDue){
+    stageSel.value = 'Full Payment';
+  } else if(stageSel.value === 'Full Payment' && depositVal !== totalDue){
+    stageSel.value = depositVal > 0 ? 'Deposit 1' : '';
+  } else if(depositVal > 0 && !stageSel.value){
+    stageSel.value = 'Deposit 1';
+  }
+}
+
+function getFormTotalDue(){
+  const get = id => Number((document.getElementById(id) || {}).value || '0').toString() === 'NaN' ? 0
+    : Number(((document.getElementById(id) || {}).value || '').replace(/[^0-9]/g, '')) || 0;
+  return get('f_price') + get('f_homeServiceFee') + get('f_transportFee') + get('f_othersFee');
+}
+
+function getFormBalanceDue(){
+  const totalDue = getFormTotalDue();
+  const depositEl = document.getElementById('f_depositAmount');
+  const depositVal = depositEl ? Number(depositEl.value.replace(/[^0-9]/g, '')) || 0 : 0;
+  return Math.max(totalDue - depositVal, 0);
+}
+
+function showFieldError(inputEl, msg){
+  let err = inputEl.parentNode.querySelector('.field-error-msg');
+  if(!err){
+    err = document.createElement('div');
+    err.className = 'field-error-msg';
+    inputEl.parentNode.appendChild(err);
+  }
+  err.textContent = msg;
+  inputEl.classList.add('field-error');
+}
+
+function clearFieldError(inputEl){
+  const err = inputEl.parentNode.querySelector('.field-error-msg');
+  if(err) err.textContent = '';
+  inputEl.classList.remove('field-error');
+}
+
+function onDepositAmountInput(el){
+  formatThousands(el);
+  clearFieldError(el);
+  const val = Number(el.value.replace(/[^0-9]/g, '')) || 0;
+  const totalDue = getFormTotalDue();
+  if(val > 0 && totalDue > 0 && val > totalDue){
+    showFieldError(el, `Payment exceeds the total. Maximum: ${formatRupiah(totalDue)}.`);
+  }
+  recheckFullPaymentStage();
+}
+
+function onBalancePaymentInput(el){
+  formatThousands(el);
+  clearFieldError(el);
+  const depositEl = document.getElementById('f_depositAmount');
+  if(!depositEl) return;
+  const baseDeposit = Number(el.dataset.baseDeposit) || 0;
+  const balanceVal = Number(el.value.replace(/[^0-9]/g, '')) || 0;
+  // Use data-total if available (set at render time from editing booking), else compute from form
+  const totalDue = Number(el.dataset.total) || getFormTotalDue();
+  const maxBalance = Math.max(totalDue - baseDeposit, 0);
+
+  if(balanceVal > maxBalance && maxBalance > 0){
+    showFieldError(el, `Payment exceeds the remaining balance. Maximum payment: ${formatRupiah(maxBalance)}.`);
+  }
+
+  const newDeposit = baseDeposit + balanceVal;
+  depositEl.value = groupThousands(newDeposit);
+
+  const stageSel = document.getElementById('f_depositStage');
+  if(stageSel){
+    if(totalDue > 0 && newDeposit >= totalDue){
+      stageSel.value = 'Full Payment';
+    } else if(stageSel.value === 'Full Payment'){
+      stageSel.value = 'Deposit 1';
+    }
+  }
+}
+function formatDateLong(dateStr){
+  const [y,m,d] = dateStr.split('-').map(Number);
+  return `${d} ${MONTHS_ID[m-1]} ${y}`;
+}
+function formatTimeRange(b){
+  if(!b.time) return '';
+  return b.timeEnd ? `${b.time} - ${b.timeEnd}` : b.time;
+}
+function bookingsOnDate(dateStr){
+  return bookings.filter(b => b.date === dateStr && !b.cancelled && !b.done);
+}
+function isPastDateTime(b){
+  const now = new Date();
+  const [y, m, d] = b.date.split('-').map(Number);
+  let eventDateTime;
+  if(b.time){
+    const [hh, mm] = b.time.split(':').map(Number);
+    eventDateTime = new Date(y, m - 1, d, hh, mm);
+  } else {
+    eventDateTime = new Date(y, m - 1, d, 23, 59, 59);
+  }
+  return eventDateTime < now;
+}
+function timeToMinutes(t){
+  const [h, m] = t.split(':').map(Number);
+  return h * 60 + m;
+}
+function timeRangesOverlap(aStart, aEnd, bStart, bEnd){
+  const aS = timeToMinutes(aStart);
+  const aE = aEnd ? timeToMinutes(aEnd) : aS + 120;
+  const bS = timeToMinutes(bStart);
+  const bE = bEnd ? timeToMinutes(bEnd) : bS + 120;
+  return aS < bE && bS < aE;
+}
+function findScheduleConflict(dateStr, startTime, endTime, excludeId){
+  if(!startTime) return null;
+  return bookings.find(b => {
+    if(b.id === excludeId) return false;
+    if(b.cancelled) return false;
+    if(b.date !== dateStr) return false;
+    if(!b.time) return false;
+    return timeRangesOverlap(startTime, endTime, b.time, b.timeEnd);
+  }) || null;
+}
+function isDateBlockedAllDay(dateStr, excludeId){
+  return bookings.some(b => b.id !== excludeId && b.date === dateStr && b.allDay && !b.cancelled);
+}
+function escapeHtml(s){
+  return (s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function timeKey(b){ return b.time || '99:99'; }
+
+/* ================= CUSTOM DIALOGS (no native confirm/alert) ================= */
+function customConfirm(message, onYes, onNo){
+  const div = document.createElement('div');
+  div.className = 'overlay';
+  div.style.zIndex = '300';
+  div.innerHTML = `
+    <div class="modal w-sm">
+      <div class="modal-body" style="padding-top:24px;">
+        <p style="font-size:14px;font-weight:700;color:#000;margin:0 0 18px;line-height:1.5;">${escapeHtml(message)}</p>
+        <div class="form-actions">
+          <button type="button" class="btn btn-ghost" style="flex:1">Cancel</button>
+          <button type="button" class="btn btn-primary" style="flex:1">Yes</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(div);
+  const [noBtn, yesBtn] = div.querySelectorAll('button');
+  const cleanup = () => { if(div.parentNode) document.body.removeChild(div); };
+  yesBtn.onclick = () => { cleanup(); if(onYes) onYes(); };
+  noBtn.onclick = () => { cleanup(); if(onNo) onNo(); };
+  div.onclick = (e) => { if(e.target === div){ cleanup(); if(onNo) onNo(); } };
+}
+
+function showToast(message){
+  const el = document.createElement('div');
+  el.className = 'app-toast';
+  el.textContent = message;
+  document.body.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('show'));
+  setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(() => { if(el.parentNode) el.remove(); }, 300);
+  }, 3200);
+}
+function weekdayLabel(dateStr){
+  if(!dateStr) return '';
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return FULL_DAYS_ID[new Date(y, m - 1, d).getDay()];
+}
+function updateDateWeekday(){
+  const val = document.getElementById('f_date').value;
+  const el = document.getElementById('f_date_weekday');
+  if(el) el.textContent = weekdayLabel(val);
+}
+
+/* ================= CALENDAR RENDER ================= */
+function renderCalendar(){
+  document.getElementById('calTitle').textContent = `${MONTHS_ID[viewMonth]} ${viewYear}`;
+  const grid = document.getElementById('calGrid');
+  const hint = document.getElementById('loadingHint');
+
+  if(!dataLoaded){
+    hint.style.display = 'block';
+    grid.innerHTML = '';
+    return;
+  }
+  if(!storageWarned) hint.style.display = 'none';
+
+  let html = DAYS_ID.map(d => `<div class="cal-head">${d}</div>`).join('');
+
+  const firstOfMonth = new Date(viewYear, viewMonth, 1);
+  const startOffset = (firstOfMonth.getDay() + 6) % 7; // Monday = 0
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const daysInPrevMonth = new Date(viewYear, viewMonth, 0).getDate();
+
+  const totalCells = Math.ceil((startOffset + daysInMonth) / 7) * 7;
+
+  for(let i = 0; i < totalCells; i++){
+    const dayNum = i - startOffset + 1;
+
+    if(dayNum < 1){
+      const pd = daysInPrevMonth + dayNum;
+      html += `<div class="cal-cell faded"><div class="cal-daynum">${pd}</div></div>`;
+    } else if(dayNum > daysInMonth){
+      const nd = dayNum - daysInMonth;
+      html += `<div class="cal-cell faded"><div class="cal-daynum">${nd}</div></div>`;
+    } else {
+      const dateStr = toDateStr(viewYear, viewMonth, dayNum);
+      const isToday = dateStr === toDateStr(today.getFullYear(), today.getMonth(), today.getDate());
+      const isPast = isPastDate(dateStr);
+      const dayBookings = bookingsOnDate(dateStr)
+        .sort((a, b) => timeKey(a).localeCompare(timeKey(b)) || a.clientName.localeCompare(b.clientName));
+
+      const maxShow = window.innerWidth < 480 ? 2 : 3;
+      const shown = dayBookings.slice(0, maxShow);
+      const extra = dayBookings.length - shown.length;
+
+      const nameLines = shown.map(b => {
+        const hasDeposit = (b.depositAmount && b.depositAmount > 0) || b.depositStage === 'Full Payment';
+        const color = hasDeposit ? '#2E7D32' : '#C0392B';
+        return `<div class="cal-booking-name" style="color:${color}">${escapeHtml(b.clientName)}</div>`;
+      }).join('') + (extra > 0 ? `<div class="cal-booking-more">+${extra} more</div>` : '');
+
+      html += `<div class="cal-cell${isToday ? ' today' : ''}${isPast ? ' past' : ''}" onclick="openDayModal('${dateStr}')">
+        <div class="cal-daynum">${dayNum}</div>
+        <div class="cal-bookings">${nameLines}</div>
+      </div>`;
+    }
+  }
+  grid.innerHTML = html;
+  renderSummary();
+}
+
+function renderSummary(){
+  const list = document.getElementById('summaryList');
+  if(!list || !dataLoaded) return;
+
+  let html = '';
+  for(let i = 0; i < 3; i++){
+    const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i);
+    const dateStr = toDateStr(d.getFullYear(), d.getMonth(), d.getDate());
+    const dayBookings = bookingsOnDate(dateStr).sort((a,b) => timeKey(a).localeCompare(timeKey(b)) || a.clientName.localeCompare(b.clientName));
+    const prefix = i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : FULL_DAYS_ID[d.getDay()];
+    const dateLabel = `${d.getDate()} ${MONTHS_ID[d.getMonth()]}`;
+
+    const itemsHtml = dayBookings.length
+      ? dayBookings.map(b => summaryItemHtml(b)).join('')
+      : `<div class="summary-empty">No bookings yet</div>`;
+
+    html += `
+      <div class="summary-day">
+        <div class="summary-day-head" onclick="openDayModal('${dateStr}')">
+          <span class="summary-day-label">${prefix}</span>
+          <span class="summary-day-date">${dateLabel}</span>
+          ${dayBookings.length ? `<span class="summary-day-count">${dayBookings.length} booking</span>` : ''}
+        </div>
+        ${itemsHtml}
+      </div>
+    `;
+  }
+  list.innerHTML = html;
+}
+
+function summaryItemHtml(b){
+  const pkg = PACKAGES[b.package] || PACKAGES.Others;
+
+  let payLabel = 'No Deposit Yet';
+  let payClass = 'pay-tag none';
+  if(b.depositStage === 'Full Payment'){
+    payLabel = 'Paid in Full';
+    payClass = 'pay-tag lunas';
+  } else if(b.depositStage){
+    payLabel = b.depositStage;
+    payClass = 'pay-tag deposit';
+  }
+
+  const hasPayment = (b.depositAmount && b.depositAmount > 0) || b.depositStage === 'Full Payment';
+  const boxStyle = hasPayment ? 'background:var(--sage-tint);' : '';
+  const textColor = hasPayment ? '#000' : '#C0392B';
+
+  const handledInitial = b.handledBy === 'Team' ? 'TM' : 'ND';
+  const line2 = b.time ? `Time ${escapeHtml(b.time)} - ${escapeHtml(b.venue) || '-'} - ${handledInitial}` : `${escapeHtml(b.venue) || '-'} - ${handledInitial}`;
+
+  return `
+    <div class="summary-item" style="${boxStyle}border-radius:12px;" onclick="openDayModal('${b.date}')">
+      <span class="mini-dot" style="background:${pkg.color}"></span>
+      <div class="summary-item-text">
+        <div class="si-name" style="color:${textColor};">${escapeHtml(b.clientName)} - ${pkg.label}</div>
+        <div class="si-sub" style="color:${textColor};">${line2}</div>
+      </div>
+      <span class="${payClass}" style="flex:none;">${payLabel}</span>
+    </div>
+  `;
+}
+
+function changeMonth(delta){
+  viewMonth += delta;
+  if(viewMonth < 0){ viewMonth = 11; viewYear--; }
+  if(viewMonth > 11){ viewMonth = 0; viewYear++; }
+  renderCalendar();
+}
+function goToday(){
+  viewYear = today.getFullYear();
+  viewMonth = today.getMonth();
+  renderCalendar();
+}
+
+/* ================= VIEW SWITCHING ================= */
+function switchView(view){
+  currentView = view;
+  document.getElementById('viewHome').style.display = view === 'home' ? '' : 'none';
+  document.getElementById('viewBookings').style.display = view === 'bookings' ? '' : 'none';
+  document.getElementById('viewReport').style.display = view === 'report' ? '' : 'none';
+  document.getElementById('viewContent').style.display = view === 'content' ? '' : 'none';
+  document.getElementById('viewProfile').style.display = view === 'profile' ? '' : 'none';
+  document.getElementById('navHome').classList.toggle('active', view === 'home');
+  document.getElementById('navBookings').classList.toggle('active', view === 'bookings');
+  document.getElementById('navReport').classList.toggle('active', view === 'report');
+  document.getElementById('navContent').classList.toggle('active', view === 'content');
+  document.getElementById('navProfile').classList.toggle('active', view === 'profile');
+  if(view === 'bookings'){
+    renderFilterChips();
+    renderBookingsList();
+  }
+  if(view === 'report'){
+    renderReport();
+  }
+  if(view === 'content'){
+    renderContentFilterOptions();
+    renderContentStatusChips();
+    renderContentList();
+  }
+  if(view === 'profile'){
+    renderProfileAccountInfo();
+  }
+  window.scrollTo(0, 0);
+}
+
+function refreshAll(){
+  renderCalendar();
+  if(currentView === 'bookings') renderBookingsList();
+  if(currentView === 'report') renderReport();
+  if(currentView === 'content'){
+    renderContentFilterOptions();
+    renderContentStatusChips();
+    renderContentList();
+  }
+}
+
+/* ================= BOOKINGS LIST VIEW ================= */
+function getBookingsMonths(){
+  const set = new Set();
+  bookings.forEach(b => set.add(b.date.slice(0, 7)));
+  return Array.from(set).sort();
+}
+
+/* ================= BOOKING HISTORY ================= */
+let historyMonthFilter = 'all';
+
+function openBookingHistory(){
+  const months = getBookingsMonths();
+  const monthOptions = ['<option value="all">All months</option>'].concat(
+    months.map(m => {
+      const [y, mm] = m.split('-').map(Number);
+      return `<option value="${m}" ${historyMonthFilter === m ? 'selected' : ''}>${MONTHS_ID[mm - 1]} ${y}</option>`;
+    })
+  ).join('');
+
+  showModal(`
+    <div class="overlay" onclick="if(event.target===this) closeModal()">
+      <div class="modal w-md">
+        <div class="modal-head">
+          <div>
+            <h2>Booking History</h2>
+            <div class="sub">All bookings, including cancelled</div>
+          </div>
+          <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="field" style="margin-bottom:14px;">
+            <label>Filter by Month</label>
+            <select class="content-filter-select" id="historyMonthSelect" onchange="onHistoryMonthChange(this)">${monthOptions}</select>
+          </div>
+          <div id="historyListContainer"></div>
+        </div>
+      </div>
+    </div>
+  `);
+  renderHistoryList();
+}
+
+function onHistoryMonthChange(el){
+  historyMonthFilter = el.value;
+  renderHistoryList();
+}
+
+function renderHistoryList(){
+  const container = document.getElementById('historyListContainer');
+  if(!container) return;
+
+  let filtered = bookings.slice();
+  if(historyMonthFilter !== 'all'){
+    filtered = filtered.filter(b => b.date.slice(0, 7) === historyMonthFilter);
+  }
+  filtered.sort((a, b) => a.date.localeCompare(b.date) || timeKey(a).localeCompare(timeKey(b)) || a.clientName.localeCompare(b.clientName));
+
+  if(filtered.length === 0){
+    container.innerHTML = `<div class="empty-hint" style="padding:30px 10px;">No bookings for this filter.</div>`;
+    return;
+  }
+
+  const rows = filtered.map(b => {
+    const pkg = PACKAGES[b.package] || PACKAGES.Others;
+    return `
+      <div class="content-row" style="cursor:pointer;" onclick="openBookingDetailFromHistory('${b.id}')">
+        <div class="content-row-left">
+          <div class="content-name">${escapeHtml(b.clientName)}${b.cancelled ? ' <span class="history-cancelled-tag">Cancel</span>' : ''}</div>
+          <div class="history-date">${formatDateLong(b.date)}</div>
+          <div class="content-pkg" style="color:${pkg.color}">${pkg.label}${b.hairdo ? ' · ' + escapeHtml(b.hairdo) : ''}</div>
+          ${b.cancelled ? `<div class="history-cancel-reason">Cancel reason: ${escapeHtml(b.cancelReason) || 'No reason given'}</div>` : ''}
+        </div>
+        <span class="settings-row-chevron">›</span>
+      </div>
+    `;
+  }).join('');
+
+  container.innerHTML = `<div class="list-card" style="padding:4px 14px;">${rows}</div>`;
+}
+
+function openBookingDetailFromHistory(id){
+  const b = bookings.find(x => x.id === id);
+  if(!b) return;
+  showModal(`
+    <div class="overlay" onclick="if(event.target===this) closeModal()">
+      <div class="modal w-md">
+        <div class="modal-head">
+          <div>
+            <h2>Booking Detail</h2>
+            <div class="sub">${formatDateLong(b.date)}</div>
+          </div>
+          <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          ${bookingCardHtml(b)}
+        </div>
+      </div>
+    </div>
+  `);
+}
+
+function renderBookingsMonthOptions(){
+  const el = document.getElementById('bookingsMonthSelect');
+  if(!el) return;
+  const months = getBookingsMonths();
+  const opts = ['<option value="all">All months</option>'].concat(
+    months.map(m => {
+      const [y, mm] = m.split('-').map(Number);
+      return `<option value="${m}">${MONTHS_ID[mm - 1]} ${y}</option>`;
+    })
+  );
+  el.innerHTML = opts.join('');
+  el.value = months.includes(bookingsMonthFilter) || bookingsMonthFilter === 'all' ? bookingsMonthFilter : 'all';
+}
+
+function onBookingsMonthChange(el){
+  bookingsMonthFilter = el.value;
+  renderBookingsList();
+}
+
+function renderFilterChips(){
+  const el = document.getElementById('filterChips');
+  if(!el) return;
+  const opts = [['All', 'All']].concat(
+    [['No Deposit Yet', 'No Deposit Yet']],
+    DEPOSIT_STAGES.map(s => [s, s])
+  );
+  el.innerHTML = opts.map(([key, label]) =>
+    `<option value="${key}" ${activeFilter === key ? 'selected' : ''}>${label}</option>`
+  ).join('');
+}
+
+function setFilter(key){
+  activeFilter = key;
+  renderFilterChips();
+  renderBookingsList();
+}
+
+function renderBookingsList(){
+  const container = document.getElementById('bookingsListContainer');
+  if(!container || !dataLoaded) return;
+  renderBookingsMonthOptions();
+
+  const paymentStageOf = b => b.depositStage || 'No Deposit Yet';
+
+  let filtered = (activeFilter === 'All' ? bookings.slice() : bookings.filter(b => paymentStageOf(b) === activeFilter))
+    .filter(b => !b.cancelled && !b.done);
+
+  if(bookingsMonthFilter !== 'all'){
+    filtered = filtered.filter(b => b.date.slice(0, 7) === bookingsMonthFilter);
+  }
+
+  filtered.sort((a, b) => a.date.localeCompare(b.date) || timeKey(a).localeCompare(timeKey(b)) || a.clientName.localeCompare(b.clientName));
+
+  if(filtered.length === 0){
+    container.innerHTML = `<div class="empty-hint" style="padding:36px 10px;">No bookings${activeFilter !== 'All' ? ' for this payment stage' : ''}${bookingsMonthFilter !== 'all' ? ' in this month' : ''}.</div>`;
+    return;
+  }
+
+  const groups = {};
+  filtered.forEach(b => { (groups[b.date] = groups[b.date] || []).push(b); });
+
+  const html = Object.keys(groups).sort().map(dateStr => {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const weekday = FULL_DAYS_ID[new Date(y, m - 1, d).getDay()];
+    return `
+      <div class="list-date-group">
+        <div class="list-date-head">${weekday}, ${formatDateLong(dateStr)}</div>
+        ${groups[dateStr].map(b => bookingCardHtml(b)).join('')}
+      </div>
+    `;
+  }).join('');
+
+  container.innerHTML = html;
+}
+
+/* ================= REPORT VIEW ================= */
+function isPastDate(dateStr){
+  const todayStr = toDateStr(today.getFullYear(), today.getMonth(), today.getDate());
+  return dateStr < todayStr;
+}
+
+function getReportMonths(){
+  const set = new Set();
+  bookings.forEach(b => set.add(b.date.slice(0, 7)));
+  return Array.from(set).sort();
+}
+
+function renderReportFilterChips(){
+  const el = document.getElementById('reportFilterChips');
+  if(!el) return;
+  const mainOpts = [['all', 'All'], ['booked', 'Past'], ['upcoming', 'Upcoming']];
+  const mainButtons = mainOpts.map(([key, label]) => {
+    const active = reportFilter === key;
+    return `<button class="filter-chip ${active ? 'active' : ''}" style="${active ? `background:var(--rose-tint);border-color:var(--rose);color:#000` : ''}" onclick="setReportFilter('${key}')">${label}</button>`;
+  }).join('');
+
+  const months = getReportMonths();
+  const monthOptions = ['<option value="all">All months</option>'].concat(
+    months.map(m => {
+      const [y, mm] = m.split('-').map(Number);
+      return `<option value="${m}" ${reportMonthFilter === m ? 'selected' : ''}>${MONTHS_ID[mm - 1]} ${y}</option>`;
+    })
+  ).join('');
+  const monthSelect = `<select class="content-filter-select" id="reportMonthSelect" style="max-width:150px;width:auto;padding:7px 10px;font-size:12px;" onchange="onReportMonthChange(this)">${monthOptions}</select>`;
+
+  const cancelledActive = reportFilter === 'cancelled';
+  const cancelledButton = `<button class="filter-chip ${cancelledActive ? 'active' : ''}" style="${cancelledActive ? `background:var(--rose-tint);border-color:var(--rose);color:#000` : ''}" onclick="setReportFilter('cancelled')">Cancelled</button>`;
+
+  el.innerHTML = mainButtons + monthSelect + cancelledButton;
+}
+
+function onReportMonthChange(el){
+  reportMonthFilter = el.value;
+  renderReport();
+}
+
+function setReportFilter(key){
+  reportFilter = key;
+  renderReport();
+}
+
+function getReportFilteredBookings(){
+  return bookings.filter(b => {
+    if(reportFilter === 'cancelled'){
+      if(!b.cancelled) return false;
+    } else {
+      if(b.cancelled) return false;
+      if(reportFilter === 'booked' && !isPastDate(b.date)) return false;
+      if(reportFilter === 'upcoming' && isPastDate(b.date)) return false;
+    }
+    if(reportMonthFilter !== 'all' && b.date.slice(0, 7) !== reportMonthFilter) return false;
+    return true;
+  }).sort((a, b) => a.date.localeCompare(b.date) || timeKey(a).localeCompare(timeKey(b)) || a.clientName.localeCompare(b.clientName));
+}
+
+function computeReportFinancials(filtered){
+  const isCancelledView = reportFilter === 'cancelled';
+  const totalRevenue = filtered.reduce((sum, b) => sum + (Number(b.price) || 0), 0);
+
+  if(isCancelledView){
+    return {
+      isCancelledView, totalRevenue,
+      operatingCost: 0, developmentCost: 0, hairdoCost: 0,
+      transportationCost: 0, transportRevenueTotal: 0,
+      teamCost: 0, teamRevenue: 0,
+      profit: -totalRevenue,
+    };
+  }
+
+  const teamBookings = filtered.filter(b => b.handledBy === 'Team');
+  const normalBookings = filtered.filter(b => b.handledBy !== 'Team');
+
+  const teamRevenue = teamBookings.reduce((sum, b) => sum + (Number(b.price) || 0), 0);
+  const normalRevenue = normalBookings.reduce((sum, b) => sum + (Number(b.price) || 0), 0);
+
+  const operatingCost = normalRevenue * 0.15;
+  const developmentCost = normalRevenue * 0.10;
+  const hairdoCost = normalBookings.reduce((sum, b) => sum + (Number(b.hairdoPrice) || 0), 0);
+  const transportRevenueTotal = normalBookings.reduce((sum, b) => sum + (Number(b.transportFee) || 0), 0);
+  const transportationCost = transportRevenueTotal * 0.80;
+
+  const teamCost = teamRevenue * 0.90;
+  const teamProfitShare = teamRevenue * 0.10;
+  const normalProfit = normalRevenue - operatingCost - developmentCost - hairdoCost - transportationCost;
+
+  return {
+    isCancelledView, totalRevenue,
+    operatingCost, developmentCost, hairdoCost,
+    transportationCost, transportRevenueTotal,
+    teamCost, teamRevenue,
+    profit: normalProfit + teamProfitShare,
+  };
+}
+
+function renderReport(){
+  renderReportFilterChips();
+
+  const filtered = getReportFilteredBookings();
+  const fin = computeReportFinancials(filtered);
+  const { totalRevenue, isCancelledView, operatingCost, developmentCost, hairdoCost, transportationCost, transportRevenueTotal, teamCost, teamRevenue } = fin;
+  const profit = fin.profit;
+
+  const statsEl = document.getElementById('reportStats');
+  if(statsEl){
+    statsEl.innerHTML = `
+      <div class="stat-card">
+        <div class="stat-label">Total Bookings</div>
+        <div class="stat-value">${filtered.length}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Revenue</div>
+        <div class="stat-value rose">${formatRupiah(totalRevenue)}</div>
+      </div>
+    `;
+  }
+
+  const breakdownEl = document.getElementById('reportBreakdownCard');
+  if(breakdownEl){
+    const rows = Object.entries(PACKAGES).map(([key, pkg]) => {
+      const count = filtered.filter(b => b.package === key).length;
+      if(count === 0) return '';
+      return `
+        <div class="breakdown-row">
+          <span class="breakdown-dot" style="background:${pkg.color}"></span>
+          <span class="breakdown-label">${pkg.label}</span>
+          <span class="breakdown-count">${count}</span>
+        </div>
+      `;
+    }).join('');
+    breakdownEl.innerHTML = `<div class="stat-label" style="margin-bottom:8px;">Breakdown by Package</div>${rows || '<div class="empty-hint" style="padding:10px 0;">No packages sold for this filter.</div>'}`;
+  }
+
+  const listEl = document.getElementById('reportListContainer');
+  if(!listEl) return;
+
+  listEl.innerHTML = `
+    <div class="list-card">
+      <div class="stat-label" style="margin-bottom:12px;">Financial Analysis</div>
+      ${isCancelledView ? `<div class="finance-note">Cancelled bookings carry no operating, development, hairdo, transportation, or team cost — the full revenue is counted as a loss.</div>` : ''}
+      <div class="finance-row">
+        <span>Total Revenue</span>
+        <b>${formatRupiah(totalRevenue)}</b>
+      </div>
+      <div class="finance-row">
+        <span>Operating Cost (15%)</span>
+        <b>${formatRupiah(operatingCost)}</b>
+      </div>
+      <div class="finance-row">
+        <span>Development Cost (10%)</span>
+        <b>${formatRupiah(developmentCost)}</b>
+      </div>
+      <div class="finance-row">
+        <span>Hairdo Cost</span>
+        <b>${formatRupiah(hairdoCost)}</b>
+      </div>
+      ${transportRevenueTotal > 0 ? `
+      <div class="finance-row">
+        <span>Transportation Cost (80%)</span>
+        <b>${formatRupiah(transportationCost)}</b>
+      </div>` : ''}
+      ${teamRevenue > 0 ? `
+      <div class="finance-row">
+        <span>Team Cost (90%)</span>
+        <b>${formatRupiah(teamCost)}</b>
+      </div>` : ''}
+      <div class="finance-row finance-total${profit < 0 ? ' finance-negative' : ''}">
+        <span>Profit</span>
+        <b>${formatRupiah(profit)}</b>
+      </div>
+    </div>
+  `;
+  renderPieChart(filtered);
+}
+
+let _pieChartInstance = null;
+
+function renderPieChart(filtered){
+  const card = document.getElementById('reportPieCard');
+  const canvas = document.getElementById('reportPieChart');
+  const legendEl = document.getElementById('reportPieLegend');
+  if(!card || !canvas || !legendEl) return;
+
+  // Count only packages with at least 1 booking
+  const counts = {};
+  filtered.forEach(b => {
+    if(!b.cancelled){
+      const key = b.package || 'Others';
+      counts[key] = (counts[key] || 0) + 1;
+    }
+  });
+
+  const entries = Object.entries(counts).filter(([,v]) => v > 0);
+  if(entries.length === 0){
+    card.style.display = 'none';
+    return;
+  }
+
+  card.style.display = '';
+  const labels = entries.map(([k]) => (PACKAGES[k] || PACKAGES.Others).label);
+  const data = entries.map(([,v]) => v);
+  const colors = entries.map(([k]) => (PACKAGES[k] || PACKAGES.Others).color);
+  const tints = entries.map(([k]) => (PACKAGES[k] || PACKAGES.Others).tint);
+
+  // Destroy existing chart before re-creating
+  if(_pieChartInstance){ _pieChartInstance.destroy(); _pieChartInstance = null; }
+
+  if(typeof Chart === 'undefined'){
+    card.style.display = 'none';
+    return;
+  }
+
+  const total = data.reduce((a, b) => a + b, 0);
+
+  _pieChartInstance = new Chart(canvas, {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: tints,
+        borderColor: colors,
+        borderWidth: 2,
+        hoverOffset: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      cutout: '60%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.label}: ${ctx.parsed} booking${ctx.parsed !== 1 ? 's' : ''} (${Math.round(ctx.parsed / total * 100)}%)`
+          }
+        }
+      }
+    }
+  });
+
+  // Custom legend
+  legendEl.innerHTML = entries.map(([k, count], i) => {
+    const pkg = PACKAGES[k] || PACKAGES.Others;
+    const pct = Math.round(count / total * 100);
+    return `
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span style="width:11px;height:11px;border-radius:3px;background:${pkg.color};flex:none;"></span>
+        <span style="font-size:12px;font-weight:700;color:#000;">${pkg.label}</span>
+        <span style="font-size:12px;font-weight:800;color:#000;margin-left:auto;">${count} <span style="color:#888;font-weight:700;">(${pct}%)</span></span>
+      </div>
+    `;
+  }).join('');
+}
+
+function exportReportToExcel(){
+  if(typeof XLSX === 'undefined'){
+    showToast('Export library failed to load. Please check your connection and try again.');
+    return;
+  }
+
+  const filtered = getReportFilteredBookings();
+  const fin = computeReportFinancials(filtered);
+
+  const bookingRows = filtered.map(b => {
+    const pkg = PACKAGES[b.package] || PACKAGES.Others;
+    return {
+      Date: b.date,
+      Time: b.allDay ? 'All Day' : (b.time || ''),
+      'Client Name': b.clientName,
+      Package: pkg.label,
+      'Handled By': b.handledBy || 'Nataliadesiandra',
+      'Package Price': b.price || 0,
+      'Additional Home Service': b.homeServiceFee || 0,
+      'Additional Transport': b.transportFee || 0,
+      'Others': b.othersFee || 0,
+      'Hairdo Cost': b.hairdoPrice || 0,
+      'Deposit Stage': b.depositStage || '',
+      'Deposit Amount': b.depositAmount || 0,
+      Cancelled: b.cancelled ? 'Yes' : 'No',
+      'Cancel Reason': b.cancelReason || '',
+      Done: b.done ? 'Yes' : 'No',
+    };
+  });
+
+  const summaryRows = [
+    { Metric: 'Total Bookings', Value: filtered.length },
+    { Metric: 'Total Revenue', Value: fin.totalRevenue },
+    { Metric: 'Operating Cost (15%)', Value: fin.operatingCost },
+    { Metric: 'Development Cost (10%)', Value: fin.developmentCost },
+    { Metric: 'Hairdo Cost', Value: fin.hairdoCost },
+    { Metric: 'Transportation Cost (80%)', Value: fin.transportationCost },
+    { Metric: 'Team Cost (90%)', Value: fin.teamCost },
+    { Metric: 'Profit', Value: fin.profit },
+  ];
+
+  const wb = XLSX.utils.book_new();
+  const wsBookings = XLSX.utils.json_to_sheet(bookingRows.length ? bookingRows : [{ Note: 'No bookings for this filter' }]);
+  XLSX.utils.book_append_sheet(wb, wsBookings, 'Bookings');
+  const wsSummary = XLSX.utils.json_to_sheet(summaryRows);
+  XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
+
+  const monthLabel = reportMonthFilter === 'all' ? 'AllMonths' : reportMonthFilter;
+  const filterLabel = reportFilter.charAt(0).toUpperCase() + reportFilter.slice(1);
+  XLSX.writeFile(wb, `Booking-Report-${filterLabel}-${monthLabel}.xlsx`);
+}
+
+/* ================= CONTENT VIEW ================= */
+function getContentMonths(){
+  const set = new Set();
+  bookings.filter(b => (isPastDate(b.date) || b.done) && !b.cancelled).forEach(b => set.add(b.date.slice(0, 7)));
+  return Array.from(set).sort();
+}
+
+function renderContentFilterOptions(){
+  const el = document.getElementById('contentMonthSelect');
+  if(!el) return;
+  const months = getContentMonths();
+  const opts = ['<option value="all">All months</option>'].concat(
+    months.map(m => {
+      const [y, mm] = m.split('-').map(Number);
+      return `<option value="${m}">${MONTHS_ID[mm - 1]} ${y}</option>`;
+    })
+  );
+  el.innerHTML = opts.join('');
+  el.value = months.includes(contentMonthFilter) || contentMonthFilter === 'all' ? contentMonthFilter : 'all';
+}
+
+function onContentMonthChange(el){
+  contentMonthFilter = el.value;
+  renderContentList();
+}
+
+function renderContentStatusChips(){
+  const el = document.getElementById('contentStatusChips');
+  if(!el) return;
+  const opts = [['all', 'All']].concat(CONTENT_STATUSES.map(s => [s, s]));
+  el.innerHTML = opts.map(([key, label]) => {
+    const active = contentStatusFilter === key;
+    let styleAttr = '';
+    if(active){
+      if(key === 'all'){
+        styleAttr = `background:var(--bg);border-color:#000;color:#000;`;
+      } else {
+        const st = CONTENT_STATUS_STYLES[key];
+        styleAttr = `background:${st.bg};border-color:${st.border};color:#000;`;
+      }
+    }
+    return `<button class="filter-chip ${active ? 'active' : ''}" style="${styleAttr}" onclick="setContentStatusFilter('${key}')">${label}</button>`;
+  }).join('');
+}
+
+function setContentStatusFilter(key){
+  contentStatusFilter = key;
+  renderContentStatusChips();
+  renderContentList();
+}
+
+async function updateContentStatus(id, value){
+  const b = bookings.find(x => x.id === id);
+  if(!b) return;
+  b.contentStatus = value;
+  await persistBookings();
+  renderContentList();
+}
+
+function getOverdueContentBookings(){
+  const todayMid = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  return bookings.filter(b => {
+    if(b.cancelled) return false;
+    const status = b.contentStatus || CONTENT_STATUSES[0];
+    if(status === 'Content Posted' || status === 'No Post') return false;
+    const [y, m, d] = b.date.split('-').map(Number);
+    const eventDate = new Date(y, m - 1, d);
+    const diffDays = Math.floor((todayMid - eventDate) / 86400000);
+    return diffDays > 3;
+  }).sort((a, b) => a.date.localeCompare(b.date));
+}
+
+function renderContentAlert(){
+  const el = document.getElementById('contentAlertBanner');
+  if(!el) return;
+  const overdue = getOverdueContentBookings();
+  if(overdue.length === 0){
+    el.style.display = 'none';
+    el.innerHTML = '';
+    return;
+  }
+  const shown = overdue.slice(0, 3).map(b => escapeHtml(b.clientName)).join(', ');
+  const extra = overdue.length > 3 ? ` dan ${overdue.length - 3} lainnya` : '';
+  el.style.display = 'block';
+  el.innerHTML = `
+    <strong>${overdue.length} content needs to be finished soon</strong>
+    <div class="content-alert-names">${shown}${extra} — it has been more than 3 days since the event date.</div>
+  `;
+}
+
+function renderContentList(){
+  const container = document.getElementById('contentListContainer');
+  if(!container || !dataLoaded) return;
+  renderContentAlert();
+
+  let filtered = bookings.filter(b => (isPastDate(b.date) || b.done) && !b.cancelled);
+
+  if(contentStatusFilter === 'all'){
+    filtered = filtered.filter(b => !['Content Posted', 'No Post'].includes(b.contentStatus || CONTENT_STATUSES[0]));
+  } else {
+    filtered = filtered.filter(b => (b.contentStatus || CONTENT_STATUSES[0]) === contentStatusFilter);
+  }
+
+  if(contentMonthFilter !== 'all'){
+    filtered = filtered.filter(b => b.date.slice(0, 7) === contentMonthFilter);
+  }
+  filtered.sort((a, b) => b.date.localeCompare(a.date) || timeKey(b).localeCompare(timeKey(a)) || a.clientName.localeCompare(b.clientName));
+
+  if(filtered.length === 0){
+    container.innerHTML = `<div class="empty-hint" style="padding:36px 10px;">No bookings for this filter.</div>`;
+    return;
+  }
+
+  const rows = filtered.map(b => {
+    const pkg = PACKAGES[b.package] || PACKAGES.Others;
+    const status = b.contentStatus || CONTENT_STATUSES[0];
+    const style = CONTENT_STATUS_STYLES[status] || CONTENT_STATUS_STYLES[CONTENT_STATUSES[0]];
+    const options = CONTENT_STATUSES.map(s => `<option value="${s}" ${status === s ? 'selected' : ''}>${s}</option>`).join('');
+    return `
+      <div class="content-row">
+        <div class="content-row-left">
+          <div class="content-name">${escapeHtml(b.clientName)}${b.igAccount ? ' (' + escapeHtml(b.igAccount) + ')' : ''}</div>
+          <div class="content-pkg" style="color:${pkg.color}">${pkg.label} · ${formatDateLong(b.date)}</div>
+        </div>
+        <select class="content-status-select" style="background:${style.bg};border-color:${style.border};" onchange="updateContentStatus('${b.id}', this.value)">${options}</select>
+      </div>
+    `;
+  }).join('');
+
+  container.innerHTML = `<div class="list-card" style="padding:4px 14px;">${rows}</div>`;
+}
+
+/* ================= MODAL HELPERS ================= */
+function closeModal(){
+  document.getElementById('modalRoot').innerHTML = '';
+}
+function showModal(html){
+  const root = document.getElementById('modalRoot');
+  root.innerHTML = html;
+  rebindInlineHandlersIfNeeded(root);
+}
+
+/* Some sandboxed preview surfaces silently ignore inline onclick/onsubmit/
+   onchange/oninput attributes. We detect that once, and if confirmed, we
+   re-bind every such attribute in a given container as a real addEventListener
+   so every button, form, and dropdown keeps working regardless of where
+   this file is opened. */
+let inlineHandlersWork = true;
+function detectInlineHandlersWork(){
+  try{
+    const testEl = document.createElement('button');
+    testEl.setAttribute('onclick', 'window.__inlineHandlerTest = true;');
+    testEl.style.display = 'none';
+    document.body.appendChild(testEl);
+    testEl.click();
+    const worked = window.__inlineHandlerTest === true;
+    document.body.removeChild(testEl);
+    delete window.__inlineHandlerTest;
+    return worked;
+  }catch(e){
+    return false;
+  }
+}
+
+function rebindInlineHandlersIfNeeded(container){
+  if(inlineHandlersWork) return;
+  if(!container) return;
+
+  container.querySelectorAll('form[onsubmit]').forEach(form => {
+    if(form.dataset.rebound) return;
+    form.dataset.rebound = '1';
+    const code = form.getAttribute('onsubmit');
+    form.removeAttribute('onsubmit');
+    form.addEventListener('submit', function(e){
+      try{ new Function('event', code).call(form, e); }
+      catch(err){ console.error('Rebound submit handler failed', err); }
+    });
+  });
+
+  container.querySelectorAll('[onclick]').forEach(el => {
+    if(el.dataset.rebound) return;
+    el.dataset.rebound = '1';
+    const code = el.getAttribute('onclick');
+    el.removeAttribute('onclick');
+    el.addEventListener('click', function(e){
+      try{ new Function('event', code).call(el, e); }
+      catch(err){ console.error('Rebound click handler failed', err); }
+    });
+  });
+
+  container.querySelectorAll('[onchange]').forEach(el => {
+    if(el.dataset.rebound) return;
+    el.dataset.rebound = '1';
+    const code = el.getAttribute('onchange');
+    el.removeAttribute('onchange');
+    el.addEventListener('change', function(e){
+      try{ new Function('event', code).call(el, e); }
+      catch(err){ console.error('Rebound change handler failed', err); }
+    });
+  });
+
+  container.querySelectorAll('[oninput]').forEach(el => {
+    if(el.dataset.rebound) return;
+    el.dataset.rebound = '1';
+    const code = el.getAttribute('oninput');
+    el.removeAttribute('oninput');
+    el.addEventListener('input', function(e){
+      try{ new Function('event', code).call(el, e); }
+      catch(err){ console.error('Rebound input handler failed', err); }
+    });
+  });
+}
+
+/* ================= DAY DETAIL MODAL ================= */
+function openDayModal(dateStr, justSaved){
+  const items = bookingsOnDate(dateStr).sort((a,b) => timeKey(a).localeCompare(timeKey(b)) || a.clientName.localeCompare(b.clientName));
+  const cardsHtml = items.length ? items.map(b => bookingCardHtml(b)).join('') :
+    `<p style="color:var(--ink-soft);font-size:13.5px;">No bookings on this date yet.</p>`;
+
+  const footerButton = justSaved
+    ? `<button class="btn btn-primary btn-block" onclick="closeModal()">Close</button>`
+    : `<button class="btn btn-ghost btn-block" onclick="openAddBookingChoice('${dateStr}')">+ Add booking on this date</button>`;
+
+  showModal(`
+    <div class="overlay" onclick="if(event.target===this) closeModal()">
+      <div class="modal w-md">
+        <div class="modal-head">
+          <div>
+            <h2>${formatDateLong(dateStr)}</h2>
+            <div class="sub">${items.length} booking</div>
+          </div>
+          <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          ${cardsHtml}
+          ${footerButton}
+        </div>
+      </div>
+    </div>
+  `);
+}
+
+function bookingCardHtml(b){
+  const pkg = PACKAGES[b.package] || PACKAGES.Others;
+  let payTag = `<span class="pay-tag none">No Deposit Yet</span>`;
+  if(b.depositStage === 'Full Payment'){
+    payTag = `<span class="pay-tag lunas">Paid in Full</span>`;
+  } else if(b.depositStage){
+    payTag = `<span class="pay-tag deposit">${b.depositStage}: ${formatRupiah(b.depositAmount)}</span>`;
+  }
+
+  const totalDue = b.price + (b.homeServiceFee || 0) + (b.transportFee || 0) + (b.othersFee || 0);
+  let remaining = totalDue;
+  if(b.depositStage === 'Full Payment'){
+    remaining = 0;
+  } else if(b.depositAmount){
+    remaining = Math.max(remaining - b.depositAmount, 0);
+  }
+  const remainingHtml = remaining > 0
+    ? `<button type="button" class="bc-remaining" onclick="openInvoice('${b.id}', true)">Balance Due: ${formatRupiah(remaining)}</button>`
+    : `<div class="bc-paid-full">Paid in Full</div>`;
+
+  return `
+    <div class="booking-card">
+      <div class="bc-top">
+        <span class="badge" style="background:${pkg.color}">${pkg.label}</span>
+        ${payTag}
+      </div>
+      <div class="bc-name">${escapeHtml(b.clientName)}</div>
+      <div class="bc-rows">
+        <span class="bc-label">Handled by</span><span class="bc-colon">:</span><span class="bc-val">${escapeHtml(b.handledBy) || 'Nataliadesiandra'}</span>
+        ${b.allDay ? `<span class="bc-label">Schedule</span><span class="bc-colon">:</span><span class="bc-val">All Day (date fully blocked)</span>` : ''}
+        ${b.time ? `<span class="bc-label">Time</span><span class="bc-colon">:</span><span class="bc-val">${escapeHtml(formatTimeRange(b))}</span>` : ''}
+        <span class="bc-label">Phone</span><span class="bc-colon">:</span><span class="bc-val">${escapeHtml(b.phone) || '-'}</span>
+        <span class="bc-label">Venue</span><span class="bc-colon">:</span><span class="bc-val">${escapeHtml(b.venue) || '-'}</span>
+        <span class="bc-label">Hairdo</span><span class="bc-colon">:</span><span class="bc-val">${escapeHtml(b.hairdo) || '-'}${b.hairdoPrice ? ' · ' + formatRupiah(b.hairdoPrice) : ''}</span>
+      </div>
+      ${b.note ? `<div class="bc-note">"${escapeHtml(b.note)}"</div>` : ''}
+      <div class="bc-price">
+        <span class="amount">${formatRupiah(totalDue)}</span>
+      </div>
+      ${remainingHtml}
+      <div class="bc-actions">
+        <button class="btn btn-ghost btn-sm" onclick="openInvoice('${b.id}')">Create Invoice</button>
+        <button class="btn btn-ghost btn-sm" onclick="openBookingConfirmation('${b.id}')">Booking Confirmation</button>
+        <button class="btn btn-ghost btn-sm" onclick="openBookingPreview('${b.id}')">Preview</button>
+        <button class="btn btn-ghost btn-sm" onclick="openBookingForm('${b.id}')">Edit</button>
+        <button class="btn btn-ghost-danger btn-sm" onclick="cancelBooking('${b.id}')">Cancel</button>
+      </div>
+      ${b.done
+        ? `<div class="bc-done-badge">Done ✓</div>`
+        : (isPastDateTime(b)
+            ? (b.depositStage === 'Full Payment'
+                ? `<button class="btn btn-primary btn-block bc-done-btn" onclick="markDone('${b.id}')">DONE</button>`
+                : `<div class="bc-done-blocked">Full payment required before this can be marked Done</div>`)
+            : '')}
+    </div>
+  `;
+}
+
+function buildConfirmationText(b){
+  const pkg = PACKAGES[b.package] || PACKAGES.Others;
+  let payStatus = 'No Deposit Yet';
+  if(b.depositStage === 'Full Payment') payStatus = 'Paid in Full';
+  else if(b.depositStage) payStatus = `${b.depositStage} - ${formatRupiah(b.depositAmount)}`;
+
+  const homeService = b.homeServiceFee || 0;
+  const transport = b.transportFee || 0;
+  const others = b.othersFee || 0;
+  const total = b.price + homeService + transport + others;
+
+  const extraLines = [
+    `Package: ${pkg.label} - ${formatRupiah(b.price)}`,
+    homeService > 0 ? `Additional Home Service: ${formatRupiah(homeService)}` : null,
+    transport > 0 ? `Additional Transport: ${formatRupiah(transport)}` : null,
+    others > 0 ? `Others: ${formatRupiah(others)}` : null,
+  ].filter(Boolean).join('\n');
+
+  return `BOOKING CONFIRMATION
+Nataliadesiandra MUA
+
+Name: ${b.clientName}
+Date: ${formatDateLong(b.date)}${b.time ? ', at ' + formatTimeRange(b) : ''}
+Venue: ${b.venue || '-'}
+Phone: ${b.phone || '-'}
+
+${extraLines}
+Total: ${formatRupiah(total)}
+
+Payment Status: ${payStatus}
+
+Thank you for booking with us. See you on your special day!`;
+}
+
+function openBookingPreview(bookingId){
+  const b = bookings.find(x => x.id === bookingId);
+  if(!b) return;
+  const pkg = PACKAGES[b.package] || PACKAGES.Others;
+
+  const homeService = b.homeServiceFee || 0;
+  const transport = b.transportFee || 0;
+  const others = b.othersFee || 0;
+  const total = b.price + homeService + transport + others;
+  let remaining = total;
+  if(b.depositStage === 'Full Payment') remaining = 0;
+  else if(b.depositAmount) remaining = Math.max(total - b.depositAmount, 0);
+
+  const rows = [
+    ['Package', pkg.label],
+    ['Client Name', b.clientName],
+    ['Handled By', b.handledBy || 'Nataliadesiandra'],
+    ['Date', formatDateLong(b.date)],
+    ['Time', b.allDay ? 'All Day' : (formatTimeRange(b) || '-')],
+    ['Phone', b.phone || '-'],
+    ['Venue', b.venue || '-'],
+    ['Look', b.look || '-'],
+    ['Retouch', b.retouch || '-'],
+    ['IG Account', b.igAccount || '-'],
+    ['Age', b.age || '-'],
+    ['Total Pax', b.totalPax || '-'],
+    ['Hairdo', b.hairdo || '-'],
+    ['Hairdo Price', b.hairdoPrice ? formatRupiah(b.hairdoPrice) : '-'],
+    ['Package Price', formatRupiah(b.price)],
+  ];
+  if(homeService > 0) rows.push(['Additional Home Service', formatRupiah(homeService)]);
+  if(transport > 0) rows.push(['Additional Transport', formatRupiah(transport)]);
+  if(others > 0) rows.push(['Others', formatRupiah(others)]);
+  rows.push(
+    ['Total', formatRupiah(total)],
+    ['Deposit', b.depositStage ? `${b.depositStage} — ${formatRupiah(b.depositAmount)}` : 'No Deposit Yet'],
+    ['Balance Due', formatRupiah(remaining)],
+    ['Note', b.note || '-'],
+  );
+  if(b.done && isPastDateTime(b)) rows.push(['Content Status', b.contentStatus || 'No content yet']);
+  if(b.cancelled) rows.push(['Cancelled', b.cancelReason || 'No reason given']);
+  if(b.done) rows.push(['Status', 'Done']);
+  rows.push(['Internal Notes', b.internalNotes || '-']);
+
+  const rowsHtml = rows.map(([label, value]) =>
+    `<div class="preview-row"><span class="preview-label">${escapeHtml(label)}</span><span class="preview-value">${escapeHtml(String(value))}</span></div>`
+  ).join('');
+
+  showModal(`
+    <div class="overlay" onclick="if(event.target===this) closeModal()">
+      <div class="modal w-md">
+        <div class="modal-head">
+          <div>
+            <h2>Booking Preview</h2>
+            <div class="sub">Read-only view</div>
+          </div>
+          <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="list-card" style="padding:4px 16px;">${rowsHtml}</div>
+          <button type="button" class="btn btn-ghost btn-block" style="margin-top:14px;" onclick="closeModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  `);
+}
+
+function openBookingConfirmation(bookingId){
+  const b = bookings.find(x => x.id === bookingId);
+  if(!b) return;
+  const text = buildConfirmationText(b);
+  showModal(`
+    <div class="overlay" onclick="if(event.target===this) closeModal()">
+      <div class="modal w-md">
+        <div class="modal-head">
+          <div>
+            <h2>Booking Confirmation</h2>
+            <div class="sub">${escapeHtml(b.clientName)}</div>
+          </div>
+          <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="inv-sheet" style="white-space:pre-line;font-size:13.5px;line-height:1.7;">${escapeHtml(text)}</div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-ghost" style="flex:1" onclick="closeModal()">Close</button>
+            <button type="button" class="btn btn-primary" style="flex:1" onclick="copyBookingConfirmation('${b.id}')">Copy Text</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `);
+}
+
+function copyBookingConfirmation(bookingId){
+  const b = bookings.find(x => x.id === bookingId);
+  if(!b) return;
+  const text = buildConfirmationText(b);
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text)
+      .then(() => showToast('Text copied.'))
+      .catch(() => showToast('Could not copy automatically. Please copy manually from the view.'));
+  } else {
+    showToast('Auto-copy is not supported on this device. Please copy manually from the view.');
+  }
+}
+
+/* ================= BOOKING FORM ================= */
+/* ================= ADD BOOKING CHOICE / IMPORT ================= */
+function openAddBookingChoice(presetDate){
+  showModal(`
+    <div class="overlay" onclick="if(event.target===this) closeModal()">
+      <div class="modal w-sm">
+        <div class="modal-head">
+          <div>
+            <h2>Add Booking</h2>
+            <div class="sub">Choose how to add a booking</div>
+          </div>
+          <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <button id="choiceNewBookingBtn" class="btn btn-primary btn-block" style="margin-bottom:10px;">New Booking</button>
+          <button id="choiceImportBtn" class="btn btn-ghost btn-block">Import from Text</button>
+        </div>
+      </div>
+    </div>
+  `);
+  const newBtn = document.getElementById('choiceNewBookingBtn');
+  const importBtn = document.getElementById('choiceImportBtn');
+  if(newBtn) newBtn.addEventListener('click', () => openBookingForm(null, presetDate || null));
+  if(importBtn) importBtn.addEventListener('click', () => openImportModal(presetDate || null));
+}
+
+function openImportModal(presetDate){
+  showModal(`
+    <div class="overlay" onclick="if(event.target===this) closeModal()">
+      <div class="modal w-md">
+        <div class="modal-head">
+          <div>
+            <h2>Import Booking</h2>
+            <div class="sub">Paste the booking form text below</div>
+          </div>
+          <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="field">
+            <textarea id="importTextArea" placeholder="Name : &#10;Phone number : &#10;Occasion : &#10;Date : &#10;Time : &#10;Location : &#10;Look : &#10;Hairdo : &#10;Retouch : &#10;IG account : &#10;Age : &#10;Total pax : " style="min-height:220px;"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-ghost" style="flex:1" onclick="closeModal()">Cancel</button>
+            <button type="button" id="importProcessBtn" class="btn btn-primary" style="flex:1">Process</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `);
+  const processBtn = document.getElementById('importProcessBtn');
+  if(processBtn) processBtn.addEventListener('click', () => processImportText(presetDate || null));
+}
+
+function parseImportText(text){
+  const map = {};
+  text.split('\n').forEach(line => {
+    const idx = line.indexOf(':');
+    if(idx === -1) return;
+    const label = line.slice(0, idx).trim().toLowerCase();
+    const value = line.slice(idx + 1).trim();
+    if(label && value) map[label] = value;
+  });
+  return map;
+}
+
+const IMPORT_MONTH_NAMES = {
+  januari:1, january:1, jan:1,
+  februari:2, february:2, feb:2,
+  maret:3, march:3, mar:3,
+  april:4, apr:4,
+  mei:5, may:5,
+  juni:6, june:6, jun:6,
+  juli:7, july:7, jul:7,
+  agustus:8, august:8, aug:8,
+  september:9, sep:9, sept:9,
+  oktober:10, october:10, oct:10,
+  november:11, nov:11,
+  desember:12, december:12, dec:12,
+};
+
+function parseFlexibleDate(str){
+  if(!str) return null;
+  str = str.trim();
+  let m = str.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if(m) return `${m[1]}-${pad(+m[2])}-${pad(+m[3])}`;
+  m = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  if(m) return `${m[3]}-${pad(+m[2])}-${pad(+m[1])}`;
+  m = str.match(/^(\d{1,2})\s+([a-zA-Z]+)\s+(\d{4})$/);
+  if(m){
+    const mm = IMPORT_MONTH_NAMES[m[2].toLowerCase()];
+    if(mm) return `${m[3]}-${pad(mm)}-${pad(+m[1])}`;
+  }
+  return null;
+}
+
+function parseFlexibleTime(str){
+  if(!str) return '';
+  str = str.trim();
+  let m = str.match(/^(\d{1,2})[:.](\d{2})\s*(am|pm)?$/i);
+  if(m){
+    let hh = +m[1];
+    const mm = m[2];
+    const ampm = m[3] ? m[3].toLowerCase() : null;
+    if(ampm === 'pm' && hh < 12) hh += 12;
+    if(ampm === 'am' && hh === 12) hh = 0;
+    return `${pad(hh)}:${mm}`;
+  }
+  m = str.match(/^(\d{1,2})\s*(am|pm)$/i);
+  if(m){
+    let hh = +m[1];
+    const ampm = m[2].toLowerCase();
+    if(ampm === 'pm' && hh < 12) hh += 12;
+    if(ampm === 'am' && hh === 12) hh = 0;
+    return `${pad(hh)}:00`;
+  }
+  return '';
+}
+
+function processImportText(presetDate){
+  const textEl = document.getElementById('importTextArea');
+  const map = parseImportText(textEl ? textEl.value : '');
+
+  const getVal = (...keys) => {
+    for(const k of keys){ if(map[k]) return map[k]; }
+    return '';
+  };
+
+  const dateVal = getVal('date');
+  const timeVal = getVal('time');
+  const lookVal = getVal('look');
+  const retouchVal = getVal('retouch');
+  const paxVal = getVal('total pax', 'pax');
+
+  const parsedDate = parseFlexibleDate(dateVal) || presetDate || toDateStr(today.getFullYear(), today.getMonth(), today.getDate());
+  const parsedTime = parseFlexibleTime(timeVal);
+  const normalizedLook = /international/i.test(lookVal) ? 'International' : (/tradition/i.test(lookVal) ? 'Traditional' : '');
+  const normalizedRetouch = /^(yes|ya)/i.test(retouchVal) ? 'Yes' : (/^(no|tidak)/i.test(retouchVal) ? 'No' : '');
+
+  const prefill = {
+    clientName: getVal('name'),
+    phone: getVal('phone number', 'phone'),
+    note: getVal('occasion'),
+    date: parsedDate,
+    time: parsedTime,
+    venue: getVal('location'),
+    look: normalizedLook,
+    hairdo: getVal('hairdo'),
+    retouch: normalizedRetouch,
+    igAccount: getVal('ig account', 'instagram', 'ig'),
+    age: getVal('age'),
+    totalPax: paxVal.replace(/[^0-9]/g, ''),
+  };
+
+  closeModal();
+  openBookingForm(null, prefill.date, prefill);
+}
+
+function derivePhoneRest(phone){
+  if(!phone) return '';
+  let p = String(phone).trim().replace(/[\s-]/g, '');
+  if(p.startsWith('+62')) p = '0' + p.slice(3);
+  else if(p.startsWith('62')) p = '0' + p.slice(2);
+  return p.startsWith('08') ? p.slice(2) : p;
+}
+
+function openBookingForm(bookingId, presetDate, prefillData){
+  const editing = bookingId ? bookings.find(b => b.id === bookingId) : null;
+  let b = editing || {
+    id: '', date: presetDate || toDateStr(today.getFullYear(), today.getMonth(), today.getDate()), time: '', timeEnd: '',
+    package: 'Signature Wedding', clientName: '', phone: '', venue: '', hairdo: '',
+    price: '', depositAmount: '', depositStage: '', note: '', internalNotes: '',
+    retouch: '', igAccount: '', age: '', totalPax: '', look: '', hairdoPrice: '', homeServiceFee: '', transportFee: '', othersFee: '',
+    allDay: false, handledBy: 'Nataliadesiandra'
+  };
+  if(!editing && prefillData){
+    b = { ...b, ...prefillData };
+  }
+  const phoneRest = derivePhoneRest(b.phone);
+
+  const pkgOptions = Object.entries(PACKAGES).map(([key, p]) =>
+    `<option value="${key}" ${b.package === key ? 'selected' : ''}>${p.label}</option>`
+  ).join('');
+
+  const stageOptions = ['<option value="">No Deposit Yet</option>']
+    .concat(DEPOSIT_STAGES.map(s => `<option value="${s}" ${b.depositStage===s?'selected':''}>${s}</option>`))
+    .join('');
+
+  showModal(`
+    <div class="overlay" onclick="if(event.target===this) closeModal()">
+      <div class="modal w-md">
+        <div class="modal-head">
+          <div>
+            <h2>${editing ? 'Edit Booking' : 'New Booking'}</h2>
+            <div class="sub">Enter the client's event details</div>
+          </div>
+          <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <form id="bookingForm" onsubmit="return submitBookingForm(event, '${editing ? editing.id : ''}')">
+            <div class="field">
+              <label>Event Date</label>
+              <input type="date" id="f_date" value="${b.date}" required oninput="updateDateWeekday()">
+              <div class="field-hint" id="f_date_weekday">${weekdayLabel(b.date)}</div>
+            </div>
+
+            <div class="row2">
+              <div class="field">
+                <label>Time Start</label>
+                <input type="time" id="f_time" value="${b.time || ''}">
+              </div>
+              <div class="field">
+                <label>Time Finish</label>
+                <input type="time" id="f_timeEnd" value="${b.timeEnd || ''}">
+              </div>
+            </div>
+
+            <div class="row2">
+              <div class="field">
+                <div class="toggle-row">
+                  <span class="toggle-label">All Day (blocks this date)</span>
+                  <label class="switch">
+                    <input type="checkbox" id="f_allDay" ${b.allDay ? 'checked' : ''}>
+                    <span class="switch-slider"></span>
+                  </label>
+                </div>
+              </div>
+              <div class="field">
+                <label>Handled By</label>
+                <select id="f_handledBy">
+                  <option value="Nataliadesiandra" ${!b.handledBy || b.handledBy === 'Nataliadesiandra' ? 'selected' : ''}>Nataliadesiandra</option>
+                  <option value="Team" ${b.handledBy === 'Team' ? 'selected' : ''}>Team</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Package Type</label>
+              <select id="f_package">${pkgOptions}</select>
+            </div>
+
+            <div class="field">
+              <label>Client Name (e.g. bride's name)</label>
+              <input type="text" id="f_clientName" value="${escapeHtml(b.clientName)}" placeholder="Client name" required>
+            </div>
+
+            <div class="row2">
+              <div class="field">
+                <label>Hairdo</label>
+                <input type="text" id="f_hairdo" value="${escapeHtml(b.hairdo || '')}" placeholder="Enter hairdo name">
+              </div>
+              <div class="field">
+                <label>Price (internal only)</label>
+                <input type="text" inputmode="numeric" id="f_hairdoPrice" value="${groupThousands(b.hairdoPrice)}" placeholder="0" oninput="formatThousands(this)">
+              </div>
+            </div>
+
+            <div class="row2">
+              <div class="field">
+                <label>Phone Number</label>
+                <div class="phone-input-group">
+                  <span class="phone-prefix">08</span>
+                  <input type="tel" id="f_phone_rest" inputmode="numeric" value="${escapeHtml(phoneRest)}" placeholder="12345678" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                </div>
+              </div>
+              <div class="field">
+                <label>Venue</label>
+                <input type="text" id="f_venue" value="${escapeHtml(b.venue)}" placeholder="Event location">
+              </div>
+            </div>
+
+            <div class="row2">
+              <div class="field">
+                <label>Look</label>
+                <select id="f_look">
+                  <option value="" ${!b.look ? 'selected' : ''}>-</option>
+                  <option value="Traditional" ${b.look === 'Traditional' ? 'selected' : ''}>Traditional</option>
+                  <option value="International" ${b.look === 'International' ? 'selected' : ''}>International</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Retouch</label>
+                <select id="f_retouch">
+                  <option value="" ${!b.retouch ? 'selected' : ''}>-</option>
+                  <option value="Yes" ${b.retouch === 'Yes' ? 'selected' : ''}>Yes</option>
+                  <option value="No" ${b.retouch === 'No' ? 'selected' : ''}>No</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row2">
+              <div class="field">
+                <label>IG Account</label>
+                <input type="text" id="f_igAccount" value="${escapeHtml(b.igAccount || '')}" placeholder="@username">
+              </div>
+              <div class="field">
+                <label>Age</label>
+                <input type="text" id="f_age" value="${escapeHtml(b.age || '')}" placeholder="Client's age">
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Total Pax</label>
+              <input type="number" id="f_totalPax" min="0" value="${b.totalPax ?? ''}" placeholder="Number of people">
+            </div>
+
+            <div class="field">
+              <label>Package Price (Rp)</label>
+              <input type="text" inputmode="numeric" id="f_price" value="${groupThousands(b.price)}" placeholder="0" oninput="formatThousands(this);recheckFullPaymentStage();" required>
+            </div>
+
+            <div class="row2">
+              <div class="field">
+                <label>Additional Home Service (Rp)</label>
+                <input type="text" inputmode="numeric" id="f_homeServiceFee" value="${groupThousands(b.homeServiceFee)}" placeholder="0" oninput="formatThousands(this);recheckFullPaymentStage();">
+              </div>
+              <div class="field">
+                <label>Additional Transport (Rp)</label>
+                <input type="text" inputmode="numeric" id="f_transportFee" value="${groupThousands(b.transportFee)}" placeholder="0" oninput="formatThousands(this);recheckFullPaymentStage();">
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Others (Rp)</label>
+              <input type="text" inputmode="numeric" id="f_othersFee" value="${groupThousands(b.othersFee)}" placeholder="0" oninput="formatThousands(this);recheckFullPaymentStage();">
+            </div>
+
+            <hr class="hr">
+            <div class="row2">
+              <div class="field">
+                <label>Deposit Amount (Rp)</label>
+                <input type="text" inputmode="numeric" id="f_depositAmount" value="${groupThousands(b.depositAmount)}" placeholder="0" oninput="onDepositAmountInput(this)">
+              </div>
+              <div class="field">
+                <label>Payment Stage</label>
+                <select id="f_depositStage">${stageOptions}</select>
+              </div>
+            </div>
+
+            ${editing && editing.depositAmount > 0 ? `
+            <div class="field">
+              <label>Balance Payment (Rp)</label>
+              <input type="text" inputmode="numeric" id="f_balancePayment" data-base-deposit="${editing.depositAmount}" data-total="${(editing.price||0)+(editing.homeServiceFee||0)+(editing.transportFee||0)+(editing.othersFee||0)}" placeholder="0" oninput="formatThousands(this);onBalancePaymentInput(this);">
+              <div class="field-hint">Adds to the existing deposit of ${formatRupiah(editing.depositAmount)}</div>
+            </div>
+            ` : ''}
+
+            <div class="field">
+              <label>Notes</label>
+              <textarea id="f_note" placeholder="Additional information…">${escapeHtml(b.note)}</textarea>
+            </div>
+
+            <div class="field">
+              <label>Internal Notes</label>
+              <textarea id="f_internalNotes" placeholder="Private notes — not shown on invoice or booking confirmation">${escapeHtml(b.internalNotes)}</textarea>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-ghost" style="flex:1" onclick="closeModal()">Cancel</button>
+              <button type="submit" id="bookingSubmitBtn" class="btn btn-primary" style="flex:1">Save Booking</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  `);
+
+  const editingIdForBind = editing ? editing.id : '';
+  const formEl = document.getElementById('bookingForm');
+  const submitBtnEl = document.getElementById('bookingSubmitBtn');
+  if(formEl){
+    formEl.addEventListener('submit', (e) => submitBookingForm(e, editingIdForBind));
+  }
+  if(submitBtnEl){
+    submitBtnEl.addEventListener('click', (e) => {
+      e.preventDefault();
+      submitBookingForm(e, editingIdForBind);
+    });
+  }
+}
+
+async function submitBookingForm(evt, editingId){
+  evt.preventDefault();
+  try{
+  const data = {
+    date: document.getElementById('f_date').value,
+    time: document.getElementById('f_time').value,
+    timeEnd: document.getElementById('f_timeEnd').value,
+    allDay: document.getElementById('f_allDay').checked,
+    handledBy: document.getElementById('f_handledBy').value,
+    package: document.getElementById('f_package').value,
+    clientName: document.getElementById('f_clientName').value.trim(),
+    hairdo: document.getElementById('f_hairdo').value.trim(),
+    hairdoPrice: (() => {
+      const raw = document.getElementById('f_hairdoPrice').value.replace(/[^0-9]/g, '');
+      return raw ? Number(raw) : null;
+    })(),
+    phone: '08' + document.getElementById('f_phone_rest').value.trim(),
+    venue: document.getElementById('f_venue').value.trim(),
+    look: document.getElementById('f_look').value,
+    retouch: document.getElementById('f_retouch').value,
+    igAccount: document.getElementById('f_igAccount').value.trim(),
+    age: document.getElementById('f_age').value.trim(),
+    totalPax: document.getElementById('f_totalPax').value ? Number(document.getElementById('f_totalPax').value) : null,
+    price: Number(document.getElementById('f_price').value.replace(/[^0-9]/g, '')) || 0,
+    homeServiceFee: (() => {
+      const raw = document.getElementById('f_homeServiceFee').value.replace(/[^0-9]/g, '');
+      return raw ? Number(raw) : null;
+    })(),
+    transportFee: (() => {
+      const raw = document.getElementById('f_transportFee').value.replace(/[^0-9]/g, '');
+      return raw ? Number(raw) : null;
+    })(),
+    othersFee: (() => {
+      const raw = document.getElementById('f_othersFee').value.replace(/[^0-9]/g, '');
+      return raw ? Number(raw) : null;
+    })(),
+    depositAmount: (() => {
+      const raw = document.getElementById('f_depositAmount').value.replace(/[^0-9]/g, '');
+      return raw ? Number(raw) : null;
+    })(),
+    depositStage: document.getElementById('f_depositStage').value,
+    note: document.getElementById('f_note').value.trim(),
+    internalNotes: document.getElementById('f_internalNotes').value.trim(),
+  };
+
+  const finalizeSave = async () => {
+    try{
+      if(editingId){
+        const idx = bookings.findIndex(b => b.id === editingId);
+        if(idx > -1) bookings[idx] = { ...bookings[idx], ...data };
+      } else {
+        bookings.push({ id: uid(), invoiceNumber: null, ...data });
+      }
+      await persistBookings();
+      const openedDate = data.date;
+      closeModal();
+      refreshAll();
+      if(currentView === 'home') openDayModal(openedDate, true);
+    }catch(err){
+      console.error(err);
+      showToast('Booking could not be saved. Please try again.');
+    }
+  };
+
+  const finishConflictCheck = async () => {
+    const conflict = data.time ? findScheduleConflict(data.date, data.time, data.timeEnd, editingId) : null;
+    if(conflict){
+      const conflictRange = conflict.timeEnd ? `${conflict.time} - ${conflict.timeEnd}` : conflict.time;
+      customConfirm(`This schedule overlaps with ${conflict.clientName}'s booking (${conflictRange}) on the same date. Are you sure you want to save it anyway?`, finalizeSave);
+    } else {
+      await finalizeSave();
+    }
+  };
+
+  if(isDateBlockedAllDay(data.date, editingId)){
+    showToast('This date is fully booked (All Day) and cannot accept more bookings.');
+    return false;
+  }
+
+  /* ---- Payment amount validation ---- */
+  const formTotalDue = (data.price || 0) + (data.homeServiceFee || 0) + (data.transportFee || 0) + (data.othersFee || 0);
+  const depositVal = data.depositAmount || 0;
+  if(depositVal < 0){
+    showToast('Payment amount cannot be negative.');
+    return false;
+  }
+  if(depositVal > formTotalDue && formTotalDue > 0){
+    const depositEl = document.getElementById('f_depositAmount');
+    if(depositEl) showFieldError(depositEl, `Payment exceeds the total. Maximum: ${formatRupiah(formTotalDue)}.`);
+    showToast(`Payment exceeds the remaining balance. Maximum payment: ${formatRupiah(formTotalDue)}.`);
+    return false;
+  }
+  /* ---- End payment validation ---- */
+
+  if(data.allDay){
+    const otherBookings = bookings.filter(b => b.id !== editingId && b.date === data.date && !b.cancelled);
+    if(otherBookings.length > 0){
+      customConfirm(`This date already has ${otherBookings.length} other booking${otherBookings.length > 1 ? 's' : ''}. Setting it to All Day will conflict with ${otherBookings.length > 1 ? 'them' : otherBookings[0].clientName}. Are you sure you want to continue?`, () => finishConflictCheck());
+      return false;
+    }
+  }
+
+  await finishConflictCheck();
+  }catch(err){
+    console.error(err);
+    showToast('Booking could not be saved. Please check the required fields and try again.');
+  }
+  return false;
+}
+
+function cancelBooking(id){
+  const b = bookings.find(x => x.id === id);
+  if(!b) return;
+  showModal(`
+    <div class="overlay" onclick="if(event.target===this) closeModal()">
+      <div class="modal w-sm">
+        <div class="modal-head">
+          <div>
+            <h2>Cancel Booking</h2>
+            <div class="sub">${escapeHtml(b.clientName)}</div>
+          </div>
+          <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="field">
+            <label>Cancellation Reason</label>
+            <textarea id="cancelReasonText" placeholder="Write the cancellation reason..."></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-ghost" style="flex:1" onclick="closeModal()">Cancel</button>
+            <button type="button" id="confirmCancelBtn" class="btn btn-danger-solid" style="flex:1">Yes, Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `);
+  const confirmBtn = document.getElementById('confirmCancelBtn');
+  if(confirmBtn) confirmBtn.addEventListener('click', () => confirmCancelBooking(id));
+}
+
+async function confirmCancelBooking(id){
+  const b = bookings.find(x => x.id === id);
+  if(!b) return;
+  const reasonEl = document.getElementById('cancelReasonText');
+  const reason = reasonEl ? reasonEl.value.trim() : '';
+  const date = b.date;
+  b.cancelled = true;
+  b.cancelReason = reason;
+  await persistBookings();
+  closeModal();
+  refreshAll();
+  if(currentView === 'home') openDayModal(date);
+}
+
+async function markDone(id){
+  const b = bookings.find(x => x.id === id);
+  if(!b) return;
+  if(b.depositStage !== 'Full Payment'){
+    showToast('This booking cannot be marked Done until it is Full Payment.');
+    return;
+  }
+  const date = b.date;
+  b.done = true;
+  await persistBookings();
+  refreshAll();
+  if(currentView === 'home') openDayModal(date);
+}
+
+/* ================= INVOICE ================= */
+function ensureInvoiceNumber(b){
+  if(!b.invoiceNumber){
+    const d = new Date();
+    const ymd = d.getFullYear().toString() + pad(d.getMonth()+1) + pad(d.getDate());
+    b.invoiceNumber = `INV-${ymd}-${b.id.slice(-4).toUpperCase()}`;
+    persistBookings();
+  }
+  return b.invoiceNumber;
+}
+
+function openInvoice(bookingId, forcePelunasan){
+  const b = bookings.find(x => x.id === bookingId);
+  if(!b) return;
+  const invNumber = ensureInvoiceNumber(b);
+  const pkg = PACKAGES[b.package] || PACKAGES.Others;
+
+  const homeService = b.homeServiceFee || 0;
+  const transport = b.transportFee || 0;
+  const others = b.othersFee || 0;
+  const totalDue = b.price + homeService + transport + others;
+
+  let paidRow = '';
+  let remaining = totalDue;
+  let statusLabel = 'No payment yet';
+  const isLunas = b.depositStage === 'Full Payment';
+  const invoiceTitle = forcePelunasan ? 'Final Payment Invoice' : (isLunas ? 'Paid in Full Invoice' : 'Invoice');
+
+  if(isLunas){
+    remaining = 0;
+    statusLabel = 'Paid in Full';
+    paidRow = `<tr><td>Payment Status</td><td class="r">Paid in Full</td></tr>`;
+  } else if(b.depositStage && b.depositAmount){
+    remaining = Math.max(totalDue - b.depositAmount, 0);
+    statusLabel = `${b.depositStage} received`;
+    paidRow = `
+      <tr><td>Booking Deposit (${b.depositStage})</td><td class="r">-${formatRupiah(b.depositAmount)}</td></tr>
+    `;
+  }
+
+  const extraRows = `
+    ${homeService > 0 ? `<tr><td>Additional Home Service</td><td class="r">${formatRupiah(homeService)}</td></tr>` : ''}
+    ${transport > 0 ? `<tr><td>Additional Transport</td><td class="r">${formatRupiah(transport)}</td></tr>` : ''}
+    ${others > 0 ? `<tr><td>Others</td><td class="r">${formatRupiah(others)}</td></tr>` : ''}
+  `;
+
+  showModal(`
+    <div class="overlay" onclick="if(event.target===this) closeModal()">
+      <div class="modal w-lg">
+        <div class="modal-head">
+          <div>
+            <h2>${invoiceTitle}</h2>
+            <div class="sub">${invNumber}</div>
+          </div>
+          <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="inv-sheet" id="invSheet">
+            <div class="inv-top">
+              <div>
+                <div class="inv-brand">Nataliadesiandra MUA</div>
+                <div class="inv-brand-sub">Makeup Artist &amp; Beauty Services</div>
+              </div>
+              <div class="inv-meta">
+                <div>No. Invoice: <b>${invNumber}</b></div>
+                <div>Invoice Date: <b>${formatDateLong(toDateStr(today.getFullYear(), today.getMonth(), today.getDate()))}</b></div>
+              </div>
+            </div>
+            <div class="inv-hr"></div>
+            <div class="inv-block-label">Billed To</div>
+            <div style="font-size:14px;line-height:1.6;">
+              <b>${escapeHtml(b.clientName)}</b><br>
+              ${escapeHtml(b.phone) || '-'}<br>
+              ${escapeHtml(b.venue) || '-'}<br>
+              Event Date: ${formatDateLong(b.date)}${b.time ? ', at ' + escapeHtml(formatTimeRange(b)) : ''}
+            </div>
+
+            <table class="inv-table">
+              <tr><td>${pkg.label}</td><td class="r">${formatRupiah(b.price)}</td></tr>
+              ${extraRows}
+              ${paidRow}
+            </table>
+
+            <div class="inv-total">
+              <span class="label">${isLunas ? 'Total Paid' : (remaining === 0 ? 'Total (Paid in Full)' : 'Remaining Balance')}</span>
+              <span class="amount">${formatRupiah(isLunas ? totalDue : remaining)}</span>
+            </div>
+            ${isLunas ? `<div class="inv-paid-full-badge">PAID IN FULL</div>` : ''}
+            <div class="inv-bank">
+              <div class="inv-bank-label">Payment Information</div>
+              <div class="inv-bank-line">BCA Account Number: 861-004-6372</div>
+              <div class="inv-bank-line">Account Name: Natalia Desiandra</div>
+            </div>
+            ${b.note ? `<div class="inv-note" style="text-align:left;font-style:italic;">Note: ${escapeHtml(b.note)}</div>` : ''}
+            <div class="inv-note" style="margin-top:16px;">Full payment is due 3 days before the event. The deposit is non-refundable.</div>
+            <div class="inv-note">Thank you for trusting us with your special moment.</div>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn btn-ghost" style="flex:1" onclick="closeModal()">Close</button>
+            <button class="btn btn-primary" style="flex:1" onclick="downloadInvoicePDF('${b.id}', ${forcePelunasan ? 'true' : 'false'})">Download Invoice</button>
+          </div>
+          <p style="font-size:11.5px;color:#000;text-align:center;margin-top:10px;">The invoice file will be saved to your device's Downloads/Photos folder.</p>
+        </div>
+      </div>
+    </div>
+  `);
+}
+
+function downloadInvoicePDF(bookingId, forcePelunasan){
+  const b = bookings.find(x => x.id === bookingId);
+  if(!b) return;
+  const invNumber = ensureInvoiceNumber(b);
+  const pkg = PACKAGES[b.package] || PACKAGES.Others;
+
+  const homeService = b.homeServiceFee || 0;
+  const transport = b.transportFee || 0;
+  const others = b.othersFee || 0;
+  const totalDue = b.price + homeService + transport + others;
+
+  let remaining = totalDue;
+  let paidLines = [];
+  const isLunas = b.depositStage === 'Full Payment';
+  const invoiceTitle = forcePelunasan ? 'Final Payment Invoice' : (isLunas ? 'Paid in Full Invoice' : 'Invoice');
+  if(isLunas){
+    remaining = 0;
+    paidLines.push(['Payment Status', 'Paid in Full']);
+  } else if(b.depositStage && b.depositAmount){
+    remaining = Math.max(totalDue - b.depositAmount, 0);
+    paidLines.push([`Booking Deposit (${b.depositStage})`, '-' + formatRupiah(b.depositAmount)]);
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const marginX = 20;
+  let y = 24;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(18);
+  doc.setTextColor(0, 0, 0);
+  doc.text('Nataliadesiandra MUA', marginX, y);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.setTextColor(0, 0, 0);
+  y += 6;
+  doc.text('Makeup Artist & Beauty Services', marginX, y);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.setTextColor(0, 0, 0);
+  y += 8;
+  doc.text(invoiceTitle.toUpperCase(), marginX, y);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.setTextColor(0, 0, 0);
+  doc.text(`No. Invoice: ${invNumber}`, 190, 24, { align: 'right' });
+  doc.text(`Invoice Date: ${formatDateLong(toDateStr(today.getFullYear(), today.getMonth(), today.getDate()))}`, 190, 30, { align: 'right' });
+
+  y += 10;
+  doc.setDrawColor(229, 227, 224);
+  doc.line(marginX, y, 190, y);
+
+  y += 10;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(0, 0, 0);
+  doc.text('BILLED TO', marginX, y);
+
+  y += 7;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(0, 0, 0);
+  doc.text(b.clientName || '-', marginX, y);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10.5);
+  y += 6;
+  doc.text(b.phone || '-', marginX, y);
+  y += 6;
+  doc.text(b.venue || '-', marginX, y);
+  y += 6;
+  doc.text(`Event Date: ${formatDateLong(b.date)}${b.time ? ', at ' + formatTimeRange(b) : ''}`, marginX, y);
+
+  y += 12;
+  doc.setDrawColor(0, 0, 0);
+  doc.line(marginX, y, 190, y);
+  y += 8;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(11.5);
+  doc.text(pkg.label, marginX, y);
+  doc.setFont('helvetica', 'bold');
+  doc.text(formatRupiah(b.price), 190, y, { align: 'right' });
+
+  const extraLines = [];
+  if(homeService > 0) extraLines.push(['Additional Home Service', formatRupiah(homeService)]);
+  if(transport > 0) extraLines.push(['Additional Transport', formatRupiah(transport)]);
+  if(others > 0) extraLines.push(['Others', formatRupiah(others)]);
+
+  extraLines.concat(paidLines).forEach(([label, val]) => {
+    y += 8;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10.5);
+    doc.text(label, marginX, y);
+    doc.setFont('helvetica', 'bold');
+    doc.text(val, 190, y, { align: 'right' });
+  });
+
+  y += 6;
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.6);
+  doc.line(marginX, y, 190, y);
+  doc.setLineWidth(0.2);
+
+  y += 10;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text(isLunas ? 'TOTAL PAID' : (remaining === 0 ? 'TOTAL (PAID IN FULL)' : 'REMAINING BALANCE'), marginX, y);
+  doc.setFontSize(15);
+  doc.text(formatRupiah(isLunas ? totalDue : remaining), 190, y, { align: 'right' });
+
+  if(isLunas){
+    y += 7;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(30, 122, 52);
+    doc.text('PAID IN FULL', 190, y, { align: 'right' });
+    doc.setTextColor(0, 0, 0);
+  }
+
+  y += 12;
+  doc.setDrawColor(0, 0, 0);
+  doc.setFillColor(245, 244, 242);
+  doc.roundedRect(marginX, y, 170, 18, 2, 2, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(0, 0, 0);
+  doc.text('PAYMENT INFORMATION', marginX + 5, y + 6);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10.5);
+  doc.text('BCA Account Number: 861-004-6372', marginX + 5, y + 12);
+  doc.text('Account Name: Natalia Desiandra', marginX + 5, y + 17);
+  y += 24;
+
+  if(b.note){
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    const noteLines = doc.splitTextToSize(`Note: ${b.note}`, 170);
+    doc.text(noteLines, marginX, y);
+    y += noteLines.length * 5;
+  }
+
+  y += 10;
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(10);
+  doc.setTextColor(0, 0, 0);
+  const termsLines = doc.splitTextToSize('Full payment is due 3 days before the event. The deposit is non-refundable.', 170);
+  doc.text(termsLines, 105, y, { align: 'center' });
+  y += termsLines.length * 5 + 6;
+
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(10);
+  doc.setTextColor(0, 0, 0);
+  doc.text('Thank you for trusting us with your special moment.', 105, y, { align: 'center' });
+
+  doc.save(`${invNumber}.pdf`);
+}
+
+/* ================= PROFILE ================= */
+let profilePhotoDataUrl = null;
+
+async function loadProfilePhoto(){
+  if(!storageAvailable) return;
+  try{
+    const res = await window.storage.get('profilePhoto', false);
+    if(res && res.value) profilePhotoDataUrl = res.value;
+  }catch(e){ /* no photo saved yet */ }
+  renderProfileAvatar();
+}
+
+function renderProfileAvatar(){
+  const el = document.getElementById('profileAvatar');
+  if(!el) return;
+  el.innerHTML = profilePhotoDataUrl
+    ? `<img src="${profilePhotoDataUrl}" alt="Foto profil">`
+    : `<span>N</span>`;
+}
+
+function triggerProfilePhotoUpload(){
+  const input = document.getElementById('profilePhotoInput');
+  if(input) input.click();
+}
+
+function handleProfilePhotoUpload(evt){
+  const file = evt.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async () => {
+    profilePhotoDataUrl = reader.result;
+    renderProfileAvatar();
+    if(storageAvailable){
+      try{ await window.storage.set('profilePhoto', profilePhotoDataUrl, false); }
+      catch(e){ console.error('Gagal menyimpan foto profil', e); }
+    }
+  };
+  reader.readAsDataURL(file);
+  evt.target.value = '';
+}
+
+/* ================= LOGIN / ACCOUNT ================= */
+const DEFAULT_CREDENTIALS = { username: 'natalia', password: 'mua2026' };
+let appAccount = null;
+
+async function loadAccount(){
+  if(!storageAvailable){
+    appAccount = { ...DEFAULT_CREDENTIALS };
+    return;
+  }
+  try{
+    const res = await window.storage.get('appAccount', false);
+    appAccount = (res && res.value) ? JSON.parse(res.value) : { ...DEFAULT_CREDENTIALS };
+  }catch(e){
+    appAccount = { ...DEFAULT_CREDENTIALS };
+  }
+}
+
+async function saveAccount(username, password){
+  appAccount = { username, password };
+  if(!storageAvailable) return;
+  try{
+    await window.storage.set('appAccount', JSON.stringify(appAccount), false);
+  }catch(e){
+    console.error('Could not save account', e);
+  }
+}
+
+function togglePasswordVisibility(inputId, btn){
+  const input = document.getElementById(inputId);
+  if(!input) return;
+  const showing = input.type === 'password';
+  input.type = showing ? 'text' : 'password';
+  if(btn){
+    btn.classList.toggle('showing', showing);
+    btn.setAttribute('aria-label', showing ? 'Hide password' : 'Show password');
+  }
+}
+
+function showSignupView(){
+  document.getElementById('loginView').style.display = 'none';
+  document.getElementById('signupView').style.display = '';
+}
+function showLoginView(){
+  document.getElementById('signupView').style.display = 'none';
+  document.getElementById('loginView').style.display = '';
+}
+
+function enterApp(){
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appRoot').style.display = '';
+}
+
+/* Backup event bindings — some sandboxed preview environments ignore inline
+   onclick/onsubmit attributes, so we also bind listeners programmatically. */
+function bindAuthEventsOnce(){
+  const goSignup = document.getElementById('goToSignupBtn');
+  const goLogin = document.getElementById('goToLoginBtn');
+  const loginForm = document.getElementById('loginForm');
+  const signupForm = document.getElementById('signupForm');
+  const signupBtn = document.getElementById('signupSubmitBtn');
+  const loginBtn = document.getElementById('loginSubmitBtn');
+
+  if(goSignup) goSignup.addEventListener('click', showSignupView);
+  if(goLogin) goLogin.addEventListener('click', showLoginView);
+  if(loginForm) loginForm.addEventListener('submit', attemptLogin);
+  if(signupForm) signupForm.addEventListener('submit', attemptSignup);
+  if(signupBtn) signupBtn.addEventListener('click', (e) => { e.preventDefault(); attemptSignup(e); });
+  if(loginBtn) loginBtn.addEventListener('click', (e) => { e.preventDefault(); attemptLogin(e); });
+}
+
+function renderProfileAccountInfo(){
+  const el = document.getElementById('profileUsernameDisplay');
+  if(el) el.textContent = appAccount ? appAccount.username : '-';
+}
+
+function confirmLogout(){
+  customConfirm('Are you sure you want to log out?', doLogout);
+}
+
+function doLogout(){
+  document.getElementById('appRoot').style.display = 'none';
+  document.getElementById('loginScreen').style.display = '';
+  showLoginView();
+  const lu = document.getElementById('loginUser'); if(lu) lu.value = '';
+  const lp = document.getElementById('loginPass'); if(lp) lp.value = '';
+  const le = document.getElementById('loginError'); if(le) le.style.display = 'none';
+}
+
+function openChangePasswordModal(){
+  showModal(`
+    <div class="overlay" onclick="if(event.target===this) closeModal()">
+      <div class="modal w-sm">
+        <div class="modal-head">
+          <div>
+            <h2>Change Password</h2>
+            <div class="sub">${escapeHtml(appAccount ? appAccount.username : '')}</div>
+          </div>
+          <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <form id="changePasswordForm" onsubmit="return submitChangePassword(event)">
+            <div class="field">
+              <label>Current Password</label>
+              <div class="password-input-group">
+                <input type="password" id="cpCurrent" autocomplete="current-password" required>
+                <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('cpCurrent', this)" aria-label="Show password">
+                  <svg class="eye-icon" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="field">
+              <label>New Password</label>
+              <div class="password-input-group">
+                <input type="password" id="cpNew" autocomplete="new-password" required>
+                <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('cpNew', this)" aria-label="Show password">
+                  <svg class="eye-icon" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="field">
+              <label>Confirm New Password</label>
+              <div class="password-input-group">
+                <input type="password" id="cpConfirm" autocomplete="new-password" required>
+                <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('cpConfirm', this)" aria-label="Show password">
+                  <svg class="eye-icon" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
+            </div>
+            <div id="cpError" class="login-error" style="display:none;"></div>
+            <div class="form-actions">
+              <button type="button" class="btn btn-ghost" style="flex:1" onclick="closeModal()">Cancel</button>
+              <button type="submit" id="cpSubmitBtn" class="btn btn-primary" style="flex:1">Save</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  `);
+  const form = document.getElementById('changePasswordForm');
+  const btn = document.getElementById('cpSubmitBtn');
+  if(form) form.addEventListener('submit', submitChangePassword);
+  if(btn) btn.addEventListener('click', (e) => { e.preventDefault(); submitChangePassword(e); });
+}
+
+function submitChangePassword(evt){
+  evt.preventDefault();
+  try{
+    const cur = document.getElementById('cpCurrent').value;
+    const nw = document.getElementById('cpNew').value;
+    const conf = document.getElementById('cpConfirm').value;
+    const errEl = document.getElementById('cpError');
+
+    if(!appAccount || cur !== appAccount.password){
+      errEl.textContent = 'Current password is incorrect.';
+      errEl.style.display = 'block';
+      return false;
+    }
+    if(!nw){
+      errEl.textContent = 'Please enter a new password.';
+      errEl.style.display = 'block';
+      return false;
+    }
+    if(nw !== conf){
+      errEl.textContent = 'New passwords do not match.';
+      errEl.style.display = 'block';
+      return false;
+    }
+
+    const username = appAccount.username;
+    appAccount = { username, password: nw };
+    closeModal();
+    showToast('Password updated.');
+    saveAccount(username, nw).catch(err => console.error('Could not save account', err));
+  }catch(err){
+    console.error(err);
+    showToast('Something went wrong. Please try again.');
+  }
+  return false;
+}
+
+/* Backup event bindings — some sandboxed preview environments ignore inline
+   onclick/onsubmit attributes, so we also bind listeners programmatically. */
+function attemptLogin(evt){
+  evt.preventDefault();
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginError');
+
+  if(appAccount && u === appAccount.username && p === appAccount.password){
+    errEl.style.display = 'none';
+    enterApp();
+  } else {
+    errEl.textContent = 'Incorrect User ID or password.';
+    errEl.style.display = 'block';
+  }
+  return false;
+}
+
+async function attemptSignup(evt){
+  evt.preventDefault();
+  try{
+    const u = document.getElementById('signupUser').value.trim();
+    const p = document.getElementById('signupPass').value;
+    const pc = document.getElementById('signupPassConfirm').value;
+    const errEl = document.getElementById('signupError');
+
+    if(!u || !p){
+      errEl.textContent = 'Please fill in both fields.';
+      errEl.style.display = 'block';
+      return false;
+    }
+    if(p !== pc){
+      errEl.textContent = 'Passwords do not match.';
+      errEl.style.display = 'block';
+      return false;
+    }
+
+    appAccount = { username: u, password: p };
+    errEl.style.display = 'none';
+    enterApp();
+    showToast('Account created.');
+
+    saveAccount(u, p).catch(err => console.error('Could not save account', err));
+  }catch(err){
+    console.error(err);
+    showToast('Something went wrong. Please try again.');
+  }
+  return false;
+}
+
+/* ================= INIT ================= */
+bindAuthEventsOnce();
+inlineHandlersWork = detectInlineHandlersWork();
+if(!inlineHandlersWork){
+  console.warn('Inline event handlers are not executing in this view — falling back to programmatic event bindings.');
+  rebindInlineHandlersIfNeeded(document.body);
+}
+(async function init(){
+  renderCalendar();
+  await loadAccount();
+  await loadBookings();
+  await loadProfilePhoto();
+  renderCalendar();
+  if(!inlineHandlersWork) rebindInlineHandlersIfNeeded(document.body);
+})();
+</script>
+</body>
+</html>
