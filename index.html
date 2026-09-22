@@ -414,6 +414,28 @@ body{
 .password-toggle-btn .eye-icon{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.8;}
 .password-toggle-btn.showing{color:var(--rose);}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.time-row{gap:8px;}
+.time-field{min-width:0;}
+.time-label{font-size:11.5px !important;font-weight:700;color:#000;margin-bottom:3px;display:block;}
+.time-input{
+  width:100%;
+  padding:7px 10px !important;
+  font-size:13px !important;
+  border-radius:8px;
+  border:1.5px solid var(--line);
+  background:#fff;
+  color:#000;
+  font-weight:700;
+  box-sizing:border-box;
+  -webkit-appearance:none;
+  appearance:none;
+  min-width:0;
+}
+.time-input:focus{outline:none;border-color:var(--rose);}
+@media(max-width:360px){
+  .time-input{font-size:12px !important;padding:6px 8px !important;}
+  .time-label{font-size:11px !important;}
+}
 .segmented{display:flex;flex-wrap:wrap;gap:8px;}
 .seg-btn{
   border:1.5px solid var(--line);
@@ -957,7 +979,7 @@ body{
   </div>
 
   <div class="summary-card">
-    <h3 class="summary-title">Bookings for the Next 3 Days</h3>
+    <h3 class="summary-title">Bookings for the Next 7 Days</h3>
     <div id="summaryList"></div>
   </div>
   </div>
@@ -1268,9 +1290,9 @@ function recheckFullPaymentStage(){
 }
 
 function getFormTotalDue(){
-  const get = id => Number((document.getElementById(id) || {}).value || '0').toString() === 'NaN' ? 0
-    : Number(((document.getElementById(id) || {}).value || '').replace(/[^0-9]/g, '')) || 0;
-  return get('f_price') + get('f_homeServiceFee') + get('f_transportFee') + get('f_othersFee');
+  const get = id => Number(((document.getElementById(id) || {}).value || '').replace(/[^0-9]/g, '')) || 0;
+  const pax = get('f_totalPax') || 1;
+  return (get('f_price') * pax) + get('f_homeServiceFee') + get('f_transportFee') + get('f_othersFee');
 }
 
 function getFormBalanceDue(){
@@ -1335,6 +1357,15 @@ function onBalancePaymentInput(el){
     }
   }
 }
+function bookingBasePrice(b){
+  const price = Number(b.price) || 0;
+  const pax = Number(b.totalPax) || 1;
+  return price * (pax < 1 ? 1 : pax);
+}
+function bookingTotalDue(b){
+  return bookingBasePrice(b) + (Number(b.homeServiceFee) || 0) + (Number(b.transportFee) || 0) + (Number(b.othersFee) || 0);
+}
+
 function formatDateLong(dateStr){
   const [y,m,d] = dateStr.split('-').map(Number);
   return `${d} ${MONTHS_ID[m-1]} ${y}`;
@@ -1476,8 +1507,13 @@ function renderCalendar(){
       const extra = dayBookings.length - shown.length;
 
       const nameLines = shown.map(b => {
-        const hasDeposit = (b.depositAmount && b.depositAmount > 0) || b.depositStage === 'Full Payment';
-        const color = hasDeposit ? '#2E7D32' : '#C0392B';
+        let color;
+        if(b.handledBy === 'Team'){
+          color = '#7C3AED';
+        } else {
+          const hasDeposit = (b.depositAmount && b.depositAmount > 0) || b.depositStage === 'Full Payment';
+          color = hasDeposit ? '#2E7D32' : '#C0392B';
+        }
         return `<div class="cal-booking-name" style="color:${color}">${escapeHtml(b.clientName)}</div>`;
       }).join('') + (extra > 0 ? `<div class="cal-booking-more">+${extra} more</div>` : '');
 
@@ -1496,7 +1532,7 @@ function renderSummary(){
   if(!list || !dataLoaded) return;
 
   let html = '';
-  for(let i = 0; i < 3; i++){
+  for(let i = 0; i < 7; i++){
     const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i);
     const dateStr = toDateStr(d.getFullYear(), d.getMonth(), d.getDate());
     const dayBookings = bookingsOnDate(dateStr).sort((a,b) => timeKey(a).localeCompare(timeKey(b)) || a.clientName.localeCompare(b.clientName));
@@ -1845,7 +1881,7 @@ function getReportFilteredBookings(){
 
 function computeReportFinancials(filtered){
   const isCancelledView = reportFilter === 'cancelled';
-  const totalRevenue = filtered.reduce((sum, b) => sum + (Number(b.price) || 0), 0);
+  const totalRevenue = filtered.reduce((sum, b) => sum + bookingBasePrice(b), 0);
 
   if(isCancelledView){
     return {
@@ -1860,8 +1896,8 @@ function computeReportFinancials(filtered){
   const teamBookings = filtered.filter(b => b.handledBy === 'Team');
   const normalBookings = filtered.filter(b => b.handledBy !== 'Team');
 
-  const teamRevenue = teamBookings.reduce((sum, b) => sum + (Number(b.price) || 0), 0);
-  const normalRevenue = normalBookings.reduce((sum, b) => sum + (Number(b.price) || 0), 0);
+  const teamRevenue = teamBookings.reduce((sum, b) => sum + bookingBasePrice(b), 0);
+  const normalRevenue = normalBookings.reduce((sum, b) => sum + bookingBasePrice(b), 0);
 
   const operatingCost = normalRevenue * 0.15;
   const developmentCost = normalRevenue * 0.10;
@@ -1970,7 +2006,6 @@ function renderPieChart(filtered){
   const legendEl = document.getElementById('reportPieLegend');
   if(!card || !canvas || !legendEl) return;
 
-  // Count only packages with at least 1 booking
   const counts = {};
   filtered.forEach(b => {
     if(!b.cancelled){
@@ -1980,64 +2015,45 @@ function renderPieChart(filtered){
   });
 
   const entries = Object.entries(counts).filter(([,v]) => v > 0);
-  if(entries.length === 0){
-    card.style.display = 'none';
-    return;
-  }
-
+  if(entries.length === 0){ card.style.display = 'none'; return; }
   card.style.display = '';
-  const labels = entries.map(([k]) => (PACKAGES[k] || PACKAGES.Others).label);
-  const data = entries.map(([,v]) => v);
-  const colors = entries.map(([k]) => (PACKAGES[k] || PACKAGES.Others).color);
-  const tints = entries.map(([k]) => (PACKAGES[k] || PACKAGES.Others).tint);
 
-  // Destroy existing chart before re-creating
-  if(_pieChartInstance){ _pieChartInstance.destroy(); _pieChartInstance = null; }
+  const total = entries.reduce((s, [,v]) => s + v, 0);
+  const size = Math.min(260, canvas.parentElement.offsetWidth - 32);
+  const cx = size / 2, cy = size / 2, R = size / 2 - 6, r = R * 0.55;
 
-  if(typeof Chart === 'undefined'){
-    card.style.display = 'none';
-    return;
-  }
-
-  const total = data.reduce((a, b) => a + b, 0);
-
-  _pieChartInstance = new Chart(canvas, {
-    type: 'doughnut',
-    data: {
-      labels,
-      datasets: [{
-        data,
-        backgroundColor: tints,
-        borderColor: colors,
-        borderWidth: 2,
-        hoverOffset: 6,
-      }]
-    },
-    options: {
-      responsive: true,
-      cutout: '60%',
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: ctx => ` ${ctx.label}: ${ctx.parsed} booking${ctx.parsed !== 1 ? 's' : ''} (${Math.round(ctx.parsed / total * 100)}%)`
-          }
-        }
-      }
-    }
+  // Build SVG doughnut slices
+  let angle = -Math.PI / 2;
+  const slices = entries.map(([key, count]) => {
+    const pkg = PACKAGES[key] || PACKAGES.Others;
+    const sweep = (count / total) * 2 * Math.PI;
+    const x1 = cx + R * Math.cos(angle), y1 = cy + R * Math.sin(angle);
+    const x2 = cx + R * Math.cos(angle + sweep), y2 = cy + R * Math.sin(angle + sweep);
+    const xi1 = cx + r * Math.cos(angle), yi1 = cy + r * Math.sin(angle);
+    const xi2 = cx + r * Math.cos(angle + sweep), yi2 = cy + r * Math.sin(angle + sweep);
+    const large = sweep > Math.PI ? 1 : 0;
+    const d = `M ${x1} ${y1} A ${R} ${R} 0 ${large} 1 ${x2} ${y2} L ${xi2} ${yi2} A ${r} ${r} 0 ${large} 0 ${xi1} ${yi1} Z`;
+    angle += sweep;
+    return { d, color: pkg.color, tint: pkg.tint, label: pkg.label, count };
   });
 
-  // Custom legend
-  legendEl.innerHTML = entries.map(([k, count], i) => {
+  canvas.outerHTML = `<svg id="reportPieChart" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="max-width:100%;display:block;margin:0 auto;">
+    ${slices.map((s,i) => `<path d="${s.d}" fill="${s.tint}" stroke="${s.color}" stroke-width="2" stroke-linejoin="round">
+      <title>${s.label}: ${s.count} booking${s.count !== 1 ? 's' : ''} (${Math.round(s.count/total*100)}%)</title>
+    </path>`).join('')}
+    <circle cx="${cx}" cy="${cy}" r="${r - 4}" fill="white"/>
+    <text x="${cx}" y="${cy - 6}" text-anchor="middle" font-size="18" font-weight="800" fill="#000">${total}</text>
+    <text x="${cx}" y="${cy + 12}" text-anchor="middle" font-size="10" font-weight="700" fill="#888">BOOKINGS</text>
+  </svg>`;
+
+  legendEl.innerHTML = entries.map(([k, count]) => {
     const pkg = PACKAGES[k] || PACKAGES.Others;
     const pct = Math.round(count / total * 100);
-    return `
-      <div style="display:flex;align-items:center;gap:6px;">
-        <span style="width:11px;height:11px;border-radius:3px;background:${pkg.color};flex:none;"></span>
-        <span style="font-size:12px;font-weight:700;color:#000;">${pkg.label}</span>
-        <span style="font-size:12px;font-weight:800;color:#000;margin-left:auto;">${count} <span style="color:#888;font-weight:700;">(${pct}%)</span></span>
-      </div>
-    `;
+    return `<div style="display:flex;align-items:center;gap:6px;padding:3px 0;">
+      <span style="width:10px;height:10px;border-radius:2px;background:${pkg.color};flex:none;"></span>
+      <span style="font-size:11.5px;font-weight:700;color:#000;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${pkg.label}</span>
+      <span style="font-size:11.5px;font-weight:800;color:#000;white-space:nowrap;">${count} <span style="color:#888;">(${pct}%)</span></span>
+    </div>`;
   }).join('');
 }
 
@@ -2344,7 +2360,7 @@ function bookingCardHtml(b){
     payTag = `<span class="pay-tag deposit">${b.depositStage}: ${formatRupiah(b.depositAmount)}</span>`;
   }
 
-  const totalDue = b.price + (b.homeServiceFee || 0) + (b.transportFee || 0) + (b.othersFee || 0);
+  const totalDue = bookingTotalDue(b);
   let remaining = totalDue;
   if(b.depositStage === 'Full Payment'){
     remaining = 0;
@@ -2402,10 +2418,12 @@ function buildConfirmationText(b){
   const homeService = b.homeServiceFee || 0;
   const transport = b.transportFee || 0;
   const others = b.othersFee || 0;
-  const total = b.price + homeService + transport + others;
+  const basePrice = bookingBasePrice(b);
+  const total = bookingTotalDue(b);
 
+  const paxNote = (Number(b.totalPax) || 1) > 1 ? ` × ${b.totalPax} pax` : '';
   const extraLines = [
-    `Package: ${pkg.label} - ${formatRupiah(b.price)}`,
+    `Package: ${pkg.label} - ${formatRupiah(b.price)}${paxNote} = ${formatRupiah(basePrice)}`,
     homeService > 0 ? `Additional Home Service: ${formatRupiah(homeService)}` : null,
     transport > 0 ? `Additional Transport: ${formatRupiah(transport)}` : null,
     others > 0 ? `Others: ${formatRupiah(others)}` : null,
@@ -2435,7 +2453,7 @@ function openBookingPreview(bookingId){
   const homeService = b.homeServiceFee || 0;
   const transport = b.transportFee || 0;
   const others = b.othersFee || 0;
-  const total = b.price + homeService + transport + others;
+  const total = bookingTotalDue(b);
   let remaining = total;
   if(b.depositStage === 'Full Payment') remaining = 0;
   else if(b.depositAmount) remaining = Math.max(total - b.depositAmount, 0);
@@ -2455,7 +2473,10 @@ function openBookingPreview(bookingId){
     ['Total Pax', b.totalPax || '-'],
     ['Hairdo', b.hairdo || '-'],
     ['Hairdo Price', b.hairdoPrice ? formatRupiah(b.hairdoPrice) : '-'],
-    ['Package Price', formatRupiah(b.price)],
+    ['Package Price', (() => {
+      const pax = Number(b.totalPax) || 1;
+      return pax > 1 ? `${formatRupiah(b.price)} × ${pax} pax = ${formatRupiah(bookingBasePrice(b))}` : formatRupiah(b.price);
+    })()],
   ];
   if(homeService > 0) rows.push(['Additional Home Service', formatRupiah(homeService)]);
   if(transport > 0) rows.push(['Additional Transport', formatRupiah(transport)]);
@@ -2738,14 +2759,14 @@ function openBookingForm(bookingId, presetDate, prefillData){
               <div class="field-hint" id="f_date_weekday">${weekdayLabel(b.date)}</div>
             </div>
 
-            <div class="row2">
-              <div class="field">
-                <label>Time Start</label>
-                <input type="time" id="f_time" value="${b.time || ''}">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+              <div>
+                <label style="display:block;font-size:11.5px;font-weight:700;color:#000;margin-bottom:3px;">Time Start</label>
+                <input type="time" id="f_time" value="${b.time || ''}" style="width:100%;padding:7px 10px;font-size:13px;font-weight:700;border-radius:8px;border:1.5px solid var(--line);background:#fff;color:#000;box-sizing:border-box;-webkit-appearance:none;">
               </div>
-              <div class="field">
-                <label>Time Finish</label>
-                <input type="time" id="f_timeEnd" value="${b.timeEnd || ''}">
+              <div>
+                <label style="display:block;font-size:11.5px;font-weight:700;color:#000;margin-bottom:3px;">Time Finish</label>
+                <input type="time" id="f_timeEnd" value="${b.timeEnd || ''}" style="width:100%;padding:7px 10px;font-size:13px;font-weight:700;border-radius:8px;border:1.5px solid var(--line);background:#fff;color:#000;box-sizing:border-box;-webkit-appearance:none;">
               </div>
             </div>
 
@@ -2835,7 +2856,7 @@ function openBookingForm(bookingId, presetDate, prefillData){
 
             <div class="field">
               <label>Total Pax</label>
-              <input type="number" id="f_totalPax" min="0" value="${b.totalPax ?? ''}" placeholder="Number of people">
+              <input type="number" id="f_totalPax" min="0" value="${b.totalPax ?? ''}" placeholder="Number of people" oninput="recheckFullPaymentStage()">
             </div>
 
             <div class="field">
@@ -3101,7 +3122,7 @@ function openInvoice(bookingId, forcePelunasan){
   const homeService = b.homeServiceFee || 0;
   const transport = b.transportFee || 0;
   const others = b.othersFee || 0;
-  const totalDue = b.price + homeService + transport + others;
+  const totalDue = bookingTotalDue(b);
 
   let paidRow = '';
   let remaining = totalDue;
@@ -3159,7 +3180,7 @@ function openInvoice(bookingId, forcePelunasan){
             </div>
 
             <table class="inv-table">
-              <tr><td>${pkg.label}</td><td class="r">${formatRupiah(b.price)}</td></tr>
+              <tr><td>${pkg.label}${(Number(b.totalPax)||1) > 1 ? ` × ${b.totalPax} pax` : ''}</td><td class="r">${formatRupiah(bookingBasePrice(b))}</td></tr>
               ${extraRows}
               ${paidRow}
             </table>
@@ -3199,7 +3220,7 @@ function downloadInvoicePDF(bookingId, forcePelunasan){
   const homeService = b.homeServiceFee || 0;
   const transport = b.transportFee || 0;
   const others = b.othersFee || 0;
-  const totalDue = b.price + homeService + transport + others;
+  const totalDue = bookingTotalDue(b);
 
   let remaining = totalDue;
   let paidLines = [];
@@ -3273,9 +3294,11 @@ function downloadInvoicePDF(bookingId, forcePelunasan){
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(11.5);
-  doc.text(pkg.label, marginX, y);
+  const pdfPax = Number(b.totalPax) || 1;
+  const pdfPkgLabel = pdfPax > 1 ? `${pkg.label} × ${pdfPax} pax` : pkg.label;
+  doc.text(pdfPkgLabel, marginX, y);
   doc.setFont('helvetica', 'bold');
-  doc.text(formatRupiah(b.price), 190, y, { align: 'right' });
+  doc.text(formatRupiah(bookingBasePrice(b)), 190, y, { align: 'right' });
 
   const extraLines = [];
   if(homeService > 0) extraLines.push(['Additional Home Service', formatRupiah(homeService)]);
