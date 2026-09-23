@@ -30,6 +30,7 @@
 }
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;overflow-x:hidden;width:100%;}
+*,*::before,*::after{box-sizing:border-box;min-width:0;}
 body{
   background:var(--bg);
   color:var(--ink);
@@ -878,34 +879,83 @@ body{
 .inv-bank-line{font-size:13px;font-weight:600;color:var(--ink);line-height:1.5;}
 
 @media (max-width:560px){
-  .row2{grid-template-columns:1fr;}
   .cal-title{min-width:auto;font-size:18px;}
   .brand-text h1{font-size:20px;}
   .inv-meta{text-align:left;}
   .inv-top{flex-direction:column;}
 }
-@media (max-width:480px){
-  .calendar-card{padding:14px 10px;border-radius:16px;}
-  .cal-toolbar{margin-bottom:12px;}
-  .cal-nav{gap:6px;}
-  .cal-nav button{width:30px;height:30px;font-size:15px;}
-  .cal-grid{gap:3px;}
-  .cal-head{font-size:9.5px;padding-bottom:4px;}
-  .cal-cell{border-radius:7px;padding:3px 2px;}
-  .cal-daynum{font-size:10px;}
-  .cal-booking-name{font-size:8px;}
-  .cal-booking-more{font-size:7px;}
-  .brand-mark{width:38px;height:38px;font-size:19px;}
-  .brand-text h1{font-size:18px;}
-  .brand-text p{font-size:11.5px;}
-  .btn-primary{padding:10px 16px;font-size:13.5px;}
-  .summary-card{padding:14px 12px;border-radius:16px;}
-  .summary-title{font-size:15.5px;}
-  .list-card{padding:12px;border-radius:16px;}
-  .finance-total.finance-negative{margin:6px -12px -4px;padding:14px 12px 16px;}
-  .filter-chip{padding:6px 12px;font-size:11.5px;}
-  .nav-btn{padding:6px 4px;font-size:9.5px;}
-  .nav-btn svg{width:20px;height:20px;}
+
+/* ===== iPhone (430px and below) ===== */
+@media (max-width:430px){
+  .app{padding:calc(12px + env(safe-area-inset-top)) 8px calc(86px + env(safe-area-inset-bottom));}
+  /* Header */
+  .header{gap:8px;margin-bottom:16px;flex-wrap:nowrap;align-items:center;}
+  .brand{gap:8px;}
+  .brand-mark{width:36px;height:36px;font-size:17px;}
+  .brand-text h1{font-size:16px;}
+  .brand-text p{font-size:10.5px;}
+  .btn-primary{padding:9px 14px;font-size:13px;white-space:nowrap;}
+  /* Calendar */
+  .calendar-card{padding:12px 8px;border-radius:14px;}
+  .cal-toolbar{margin-bottom:10px;gap:4px;}
+  .cal-title{font-size:16px;}
+  .cal-nav{gap:4px;}
+  .cal-nav button{width:28px;height:28px;font-size:14px;}
+  .cal-grid{gap:2px;}
+  .cal-head{font-size:9px;padding-bottom:3px;}
+  .cal-cell{border-radius:6px;padding:2px 2px;}
+  .cal-daynum{font-size:9px;}
+  .cal-booking-name{font-size:7.5px;line-height:1.2;}
+  .cal-booking-more{font-size:6.5px;}
+  /* Summary card */
+  .summary-card{padding:12px 10px;border-radius:14px;margin-top:12px;}
+  .summary-title{font-size:14.5px;margin-bottom:10px;}
+  .summary-day{margin-bottom:10px;}
+  .summary-item{padding:6px 4px;gap:7px;}
+  .si-name{font-size:12.5px;}
+  .si-sub{font-size:10.5px;}
+  .pay-tag{font-size:10px;padding:3px 8px;}
+  /* List card */
+  .list-card{padding:10px;border-radius:14px;}
+  /* Filters */
+  .filter-chip{padding:5px 10px;font-size:11px;}
+  .content-filter-select{font-size:12.5px;padding:8px 10px;}
+  /* Nav */
+  .nav-btn{padding:5px 3px;font-size:9px;}
+  .nav-btn svg{width:19px;height:19px;}
+  /* Prevent any overflow */
+  .cal-bookings{overflow:hidden;}
+  .pay-tag{flex:none;max-width:50%;}
+}
+
+/* ===== Extra small iPhone (375px and below) ===== */
+@media (max-width:375px){
+  .app{padding:calc(10px + env(safe-area-inset-top)) 6px calc(84px + env(safe-area-inset-bottom));}
+  .brand-text h1{font-size:15px;}
+  .brand-text p{font-size:10px;}
+  .btn-primary{padding:8px 12px;font-size:12.5px;}
+  .cal-cell{padding:2px 1px;}
+  .cal-daynum{font-size:8.5px;}
+  .cal-booking-name{font-size:7px;}
+  .cal-booking-more{font-size:6px;}
+  .summary-card{padding:10px 8px;}
+  .si-name{font-size:12px;}
+  .si-sub{font-size:10px;}
+  .pay-tag{font-size:9.5px;padding:3px 6px;}
+  .nav-btn{font-size:8.5px;}
+}
+
+/* ===== Very small (320px) ===== */
+@media (max-width:320px){
+  .app{padding:calc(8px + env(safe-area-inset-top)) 5px calc(82px + env(safe-area-inset-bottom));}
+  .brand{gap:6px;}
+  .brand-mark{width:32px;height:32px;font-size:15px;}
+  .brand-text h1{font-size:13.5px;}
+  .btn-primary{padding:7px 10px;font-size:12px;}
+  .calendar-card{padding:8px 5px;}
+  .cal-grid{gap:2px;}
+  .cal-daynum{font-size:8px;}
+  .cal-booking-name{font-size:6.5px;}
 }
 </style>
 </head>
@@ -1331,6 +1381,13 @@ function getFormTotalDue(){
   return (get('f_price') * pax) + get('f_homeServiceFee') + get('f_transportFee') + get('f_othersFee');
 }
 
+function getFormMaxDeposit(){
+  /* Max deposit = Package Price × Total Pax (excluding additional fees) */
+  const get = id => Number(((document.getElementById(id) || {}).value || '').replace(/[^0-9]/g, '')) || 0;
+  const pax = get('f_totalPax') || 1;
+  return get('f_price') * pax;
+}
+
 function getFormBalanceDue(){
   const totalDue = getFormTotalDue();
   const depositEl = document.getElementById('f_depositAmount');
@@ -1359,9 +1416,9 @@ function onDepositAmountInput(el){
   formatThousands(el);
   clearFieldError(el);
   const val = Number(el.value.replace(/[^0-9]/g, '')) || 0;
-  const totalDue = getFormTotalDue();
-  if(val > 0 && totalDue > 0 && val > totalDue){
-    showFieldError(el, `Payment exceeds the total. Maximum: ${formatRupiah(totalDue)}.`);
+  const grandTotal = getFormTotalDue();
+  if(val > 0 && grandTotal > 0 && val > grandTotal){
+    showFieldError(el, `Payment exceeds the total booking amount. Maximum: ${formatRupiah(grandTotal)}.`);
   }
   recheckFullPaymentStage();
 }
@@ -1971,16 +2028,27 @@ function computeReportFinancials(filtered){
   const transportRevenueTotal = normalBookings.reduce((sum, b) => sum + (Number(b.transportFee) || 0), 0);
   const transportationCost = transportRevenueTotal * 0.80;
 
-  const teamCost = teamRevenue * 0.90;
+  const teamCostBase = teamRevenue * 0.90;
   const teamProfitShare = teamRevenue * 0.10;
+
+  // Diamond Wedding 26% allocation applies to ALL Diamond Wedding bookings (not only Team)
+  const diamondCost = filtered.reduce((sum, b) => {
+    if(b.package === 'Diamond Wedding'){
+      const basePrice = Number(b.price) || 0; // Package Price only, not fees
+      return sum + basePrice * 0.26;
+    }
+    return sum;
+  }, 0);
+
+  const teamCost = teamCostBase + diamondCost;
   const normalProfit = normalRevenue - operatingCost - developmentCost - hairdoCost - transportationCost;
 
   return {
     isCancelledView, totalRevenue,
     operatingCost, developmentCost, hairdoCost,
     transportationCost, transportRevenueTotal,
-    teamCost, teamRevenue,
-    profit: normalProfit + teamProfitShare,
+    teamCost, teamRevenue, diamondCost,
+    profit: normalProfit + teamProfitShare - diamondCost,
   };
 }
 
@@ -2054,7 +2122,7 @@ function renderReport(){
       </div>` : ''}
       ${teamRevenue > 0 ? `
       <div class="finance-row">
-        <span>Team Cost (90%)</span>
+        <span>Team Cost</span>
         <b>${formatRupiah(teamCost)}</b>
       </div>` : ''}
       <div class="finance-row finance-total${profit < 0 ? ' finance-negative' : ''}">
@@ -2874,7 +2942,7 @@ function openBookingForm(bookingId, presetDate, prefillData){
                 <input type="text" id="f_hairdo" value="${escapeHtml(b.hairdo || '')}" placeholder="Enter hairdo name">
               </div>
               <div class="field">
-                <label>Price (internal only)</label>
+                <label>Allocation (internal only)</label>
                 <input type="text" inputmode="numeric" id="f_hairdoPrice" value="${groupThousands(b.hairdoPrice)}" placeholder="0" oninput="formatThousands(this)">
               </div>
             </div>
@@ -2964,8 +3032,8 @@ function openBookingForm(bookingId, presetDate, prefillData){
             ${editing && editing.depositAmount > 0 ? `
             <div class="field">
               <label>Balance Payment (Rp)</label>
-              <input type="text" inputmode="numeric" id="f_balancePayment" data-base-deposit="${editing.depositAmount}" data-total="${(editing.price||0)+(editing.homeServiceFee||0)+(editing.transportFee||0)+(editing.othersFee||0)}" placeholder="0" oninput="formatThousands(this);onBalancePaymentInput(this);">
-              <div class="field-hint">Adds to the existing deposit of ${formatRupiah(editing.depositAmount)}</div>
+              <input type="text" inputmode="numeric" id="f_balancePayment" data-base-deposit="${editing.depositAmount}" data-total="${bookingTotalDue(editing)}" placeholder="0" oninput="formatThousands(this);onBalancePaymentInput(this);">
+              <div class="field-hint">Balance due: ${formatRupiah(Math.max(bookingTotalDue(editing) - (editing.depositAmount || 0), 0))}</div>
             </div>
             ` : ''}
 
@@ -3083,16 +3151,17 @@ async function submitBookingForm(evt, editingId){
   }
 
   /* ---- Payment amount validation ---- */
-  const formTotalDue = (data.price || 0) + (data.homeServiceFee || 0) + (data.transportFee || 0) + (data.othersFee || 0);
+  const pax = Number(data.totalPax) >= 1 ? Number(data.totalPax) : 1;
+  const formTotalDue = ((data.price || 0) * pax) + (data.homeServiceFee || 0) + (data.transportFee || 0) + (data.othersFee || 0);
   const depositVal = data.depositAmount || 0;
   if(depositVal < 0){
     showToast('Payment amount cannot be negative.');
     return false;
   }
-  if(depositVal > formTotalDue && formTotalDue > 0){
+  if(formTotalDue > 0 && depositVal > formTotalDue){
     const depositEl = document.getElementById('f_depositAmount');
-    if(depositEl) showFieldError(depositEl, `Payment exceeds the total. Maximum: ${formatRupiah(formTotalDue)}.`);
-    showToast(`Payment exceeds the remaining balance. Maximum payment: ${formatRupiah(formTotalDue)}.`);
+    if(depositEl) showFieldError(depositEl, `Payment exceeds the total booking amount. Maximum: ${formatRupiah(formTotalDue)}.`);
+    showToast(`Payment exceeds the total booking amount. Maximum: ${formatRupiah(formTotalDue)}.`);
     return false;
   }
   /* ---- End payment validation ---- */
