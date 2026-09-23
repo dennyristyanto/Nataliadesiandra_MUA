@@ -1989,13 +1989,15 @@ function renderReport(){
   const breakdownEl = document.getElementById('reportBreakdownCard');
   if(breakdownEl){
     const rows = Object.entries(PACKAGES).map(([key, pkg]) => {
-      const count = filtered.filter(b => b.package === key).length;
-      if(count === 0) return '';
+      const paxCount = filtered
+        .filter(b => b.package === key)
+        .reduce((sum, b) => sum + (Number(b.totalPax) >= 1 ? Number(b.totalPax) : 1), 0);
+      if(paxCount === 0) return '';
       return `
         <div class="breakdown-row">
           <span class="breakdown-dot" style="background:${pkg.color}"></span>
           <span class="breakdown-label">${pkg.label}</span>
-          <span class="breakdown-count">${count}</span>
+          <span class="breakdown-count">${paxCount}</span>
         </div>
       `;
     }).join('');
@@ -2056,7 +2058,8 @@ function renderPieChart(filtered){
   filtered.forEach(b => {
     if(!b.cancelled){
       const key = b.package || 'Others';
-      counts[key] = (counts[key] || 0) + 1;
+      const pax = Number(b.totalPax) >= 1 ? Number(b.totalPax) : 1;
+      counts[key] = (counts[key] || 0) + pax;
     }
   });
 
@@ -2065,7 +2068,7 @@ function renderPieChart(filtered){
   card.style.display = '';
 
   const total = entries.reduce((s, [,v]) => s + v, 0);
-  const size = Math.min(260, canvas.parentElement.offsetWidth - 32);
+  const size = Math.min(260, card.offsetWidth - 32);
   const cx = size / 2, cy = size / 2, R = size / 2 - 6, r = R * 0.55;
 
   // Build SVG doughnut slices
@@ -2089,7 +2092,7 @@ function renderPieChart(filtered){
     </path>`).join('')}
     <circle cx="${cx}" cy="${cy}" r="${r - 4}" fill="white"/>
     <text x="${cx}" y="${cy - 6}" text-anchor="middle" font-size="18" font-weight="800" fill="#000">${total}</text>
-    <text x="${cx}" y="${cy + 12}" text-anchor="middle" font-size="10" font-weight="700" fill="#888">BOOKINGS</text>
+    <text x="${cx}" y="${cy + 12}" text-anchor="middle" font-size="10" font-weight="700" fill="#888">PACKAGES</text>
   </svg>`;
 
   legendEl.innerHTML = entries.map(([k, count]) => {
