@@ -41,11 +41,11 @@ body{
 .app{
   max-width:920px;
   margin:0 auto;
-  padding:calc(20px + env(safe-area-inset-top)) 16px 100px;
+  padding:calc(20px + env(safe-area-inset-top)) 16px calc(80px + env(safe-area-inset-bottom,0px));
   box-sizing:border-box;
 }
 @media (max-width:480px){
-  .app{ padding:calc(14px + env(safe-area-inset-top)) 10px 92px; }
+  .app{ padding:calc(14px + env(safe-area-inset-top)) 10px calc(80px + env(safe-area-inset-bottom,0px)); }
 }
 
 /* ---------- Header ---------- */
@@ -629,27 +629,89 @@ body{
 }
 
 /* ---------- Content view ---------- */
+/* ===== CONTENT PAGE — modern redesign ===== */
 .content-filter-select{
   width:100%;
   padding:10px 12px;
-  border-radius:10px;
+  border-radius:12px;
   border:1.5px solid var(--line);
-  font-size:14px;
+  font-size:13.5px;
   font-weight:600;
   color:var(--ink);
   background:#fff;
   font-family:inherit;
+  transition:border-color .15s ease;
+  appearance:none;
+  -webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 12px center;
+  padding-right:32px;
 }
+.content-filter-select:focus{outline:none;border-color:var(--rose);}
+
+/* Content cards */
 .content-row{
   display:flex;
   align-items:center;
-  gap:10px;
-  padding:13px 4px;
-  border-bottom:1px solid var(--line);
+  gap:12px;
+  padding:14px 16px;
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 1px 4px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04);
+  margin-bottom:10px;
+  transition:box-shadow .15s ease, transform .12s ease;
 }
-.content-row:last-child{border-bottom:none;}
+.content-row:last-child{margin-bottom:0;}
+.content-row:hover{box-shadow:0 4px 12px rgba(0,0,0,0.10);}
 .content-row-left{flex:1;min-width:0;}
-.content-name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.content-name{
+  font-size:14.5px;
+  font-weight:800;
+  color:#111;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  line-height:1.3;
+}
+.content-pkg{
+  font-size:11.5px;
+  font-weight:700;
+  margin-top:4px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  color:var(--ink-soft);
+}
+.content-status-select{
+  flex:none;
+  border:1.5px solid;
+  border-radius:20px;
+  padding:6px 10px 6px 10px;
+  font-size:11.5px;
+  font-weight:700;
+  color:#000;
+  max-width:145px;
+  font-family:inherit;
+  transition:all .15s ease;
+  appearance:none;
+  -webkit-appearance:none;
+  text-align:center;
+  cursor:pointer;
+}
+.content-status-select:focus{outline:none;}
+
+/* Alert banner */
+.content-alert{
+  margin-bottom:16px;
+  padding:14px 16px;
+  border-radius:16px;
+  background:linear-gradient(135deg,#FCE4E8,#FBD9E1);
+  border:1px solid #F0AEB9;
+  display:none;
+}
+.content-alert strong{font-size:13.5px;display:block;margin-bottom:4px;color:#000;}
+.content-alert-names{font-size:12.5px;color:#000;line-height:1.6;}
 .history-cancelled-tag{
   display:inline-block;
   font-size:10px;
@@ -668,29 +730,7 @@ body{
   color:#000;
   margin-top:3px;
 }
-.content-pkg{font-size:12px;font-weight:600;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .history-date{font-size:11.5px;font-weight:700;color:#000;margin-top:2px;}
-.content-status-select{
-  flex:none;
-  border:1.5px solid var(--line);
-  border-radius:8px;
-  padding:7px 8px;
-  font-size:12px;
-  font-weight:700;
-  color:#000;
-  background:#fff;
-  max-width:150px;
-}
-.content-alert{
-  margin-bottom:14px;
-  padding:14px 16px;
-  border-radius:14px;
-  background:#FCE4E8;
-  border:1px solid #F0AEB9;
-  display:none;
-}
-.content-alert strong{font-size:13.5px;display:block;margin-bottom:4px;color:#000;}
-.content-alert-names{font-size:12.5px;color:#000;line-height:1.4;}
 
 /* ---------- Profile view ---------- */
 .profile-hero{
@@ -814,10 +854,12 @@ body{
   background:#fff;
   border-top:1px solid var(--line);
   display:flex;
-  justify-content:space-around;
-  gap:2px;
-  padding:8px calc(6px + env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) calc(6px + env(safe-area-inset-left));
+  justify-content:space-between;
+  align-items:stretch;
+  padding:0 env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);
   z-index:40;
+  /* Raise nav height to accommodate icons + labels + safe area */
+  min-height:calc(62px + env(safe-area-inset-bottom,0px));
 }
 .nav-btn{
   background:none;
@@ -826,17 +868,32 @@ body{
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:3px;
-  padding:6px 8px;
-  border-radius:14px;
-  color:var(--ink-soft);
+  justify-content:center;
+  gap:4px;
+  padding:8px 4px calc(8px + env(safe-area-inset-bottom,0px));
+  color:#555;
   font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;
-  font-size:10.5px;
+  font-size:11px;
   font-weight:700;
   flex:1;
   min-width:0;
+  min-height:44px; /* Touch target */
+  border-radius:0;
+  -webkit-tap-highlight-color:transparent;
 }
-.nav-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;}
+.nav-btn svg{
+  width:27px;
+  height:27px;
+  stroke:currentColor;
+  fill:none;
+  stroke-width:1.7;
+  flex:none;
+}
+.nav-btn span{
+  line-height:1;
+  white-space:nowrap;
+  font-size:11px;
+}
 .nav-btn.active{color:var(--rose);}
 .nav-btn.active svg{stroke:var(--rose);}
 
@@ -887,7 +944,7 @@ body{
 
 /* ===== iPhone (430px and below) ===== */
 @media (max-width:430px){
-  .app{padding:calc(12px + env(safe-area-inset-top)) 8px calc(86px + env(safe-area-inset-bottom));}
+  .app{padding:calc(12px + env(safe-area-inset-top)) 8px calc(78px + env(safe-area-inset-bottom,0px));}
   /* Header */
   .header{gap:8px;margin-bottom:16px;flex-wrap:nowrap;align-items:center;}
   .brand{gap:8px;}
@@ -920,9 +977,9 @@ body{
   /* Filters */
   .filter-chip{padding:5px 10px;font-size:11px;}
   .content-filter-select{font-size:12.5px;padding:8px 10px;}
-  /* Nav */
-  .nav-btn{padding:5px 3px;font-size:9px;}
-  .nav-btn svg{width:19px;height:19px;}
+  /* Nav: labels scale down slightly on very small screens */
+  .nav-btn{font-size:10px;}
+  .nav-btn svg{width:25px;height:25px;}
   /* Prevent any overflow */
   .cal-bookings{overflow:hidden;}
   .pay-tag{flex:none;max-width:50%;}
@@ -930,7 +987,7 @@ body{
 
 /* ===== Extra small iPhone (375px and below) ===== */
 @media (max-width:375px){
-  .app{padding:calc(10px + env(safe-area-inset-top)) 6px calc(84px + env(safe-area-inset-bottom));}
+  .app{padding:calc(10px + env(safe-area-inset-top)) 6px calc(76px + env(safe-area-inset-bottom,0px));}
   .brand-text h1{font-size:15px;}
   .brand-text p{font-size:10px;}
   .btn-primary{padding:8px 12px;font-size:12.5px;}
@@ -942,12 +999,13 @@ body{
   .si-name{font-size:12px;}
   .si-sub{font-size:10px;}
   .pay-tag{font-size:9.5px;padding:3px 6px;}
-  .nav-btn{font-size:8.5px;}
+  .nav-btn{font-size:9.5px;}
+  .nav-btn svg{width:24px;height:24px;}
 }
 
 /* ===== Very small (320px) ===== */
 @media (max-width:320px){
-  .app{padding:calc(8px + env(safe-area-inset-top)) 5px calc(82px + env(safe-area-inset-bottom));}
+  .app{padding:calc(8px + env(safe-area-inset-top)) 5px calc(74px + env(safe-area-inset-bottom,0px));}
   .brand{gap:6px;}
   .brand-mark{width:32px;height:32px;font-size:15px;}
   .brand-text h1{font-size:13.5px;}
@@ -1134,14 +1192,14 @@ body{
 
     <div class="content-alert" id="contentAlertBanner"></div>
 
-    <div class="list-card">
-      <div class="field" style="margin:0 0 14px;">
-        <label>Filter by Month</label>
+    <div class="list-card" style="padding:14px 16px;">
+      <div style="margin-bottom:12px;">
+        <label style="font-size:11px;font-weight:800;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.04em;display:block;margin-bottom:5px;">Month</label>
         <select class="content-filter-select" id="contentMonthSelect" onchange="onContentMonthChange(this)"></select>
       </div>
-      <div class="field" style="margin:0;">
-        <label>Filter by Status</label>
-        <div class="filter-chips" id="contentStatusChips"></div>
+      <div>
+        <label style="font-size:11px;font-weight:800;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.04em;display:block;margin-bottom:7px;">Filter by Status</label>
+        <div class="filter-chips" id="contentStatusChips" style="flex-wrap:wrap;gap:6px;margin-top:0;"></div>
       </div>
     </div>
 
@@ -2156,42 +2214,104 @@ function renderPieChart(filtered){
   card.style.display = '';
 
   const total = entries.reduce((s, [,v]) => s + v, 0);
-  const size = Math.min(260, card.offsetWidth - 32);
-  const cx = size / 2, cy = size / 2, R = size / 2 - 6, r = R * 0.55;
 
-  // Build SVG doughnut slices
+  // Sort: largest first for visual emphasis
+  entries.sort((a, b) => b[1] - a[1]);
+
+  const size = Math.min(280, card.offsetWidth - 24);
+  const cx = size / 2, cy = size / 2;
+  const R = size * 0.44;   // outer radius
+  const r = R * 0.52;      // inner radius (donut hole)
+  const explodeAmount = R * 0.07; // how far each segment "pops out"
+  const gap = 0.025;       // gap between segments in radians
+  const uid = `pie_${Date.now()}`;
+
   let angle = -Math.PI / 2;
-  const slices = entries.map(([key, count]) => {
+  const slices = entries.map(([key, count], i) => {
     const pkg = PACKAGES[key] || PACKAGES.Others;
     const sweep = (count / total) * 2 * Math.PI;
-    const x1 = cx + R * Math.cos(angle), y1 = cy + R * Math.sin(angle);
-    const x2 = cx + R * Math.cos(angle + sweep), y2 = cy + R * Math.sin(angle + sweep);
-    const xi1 = cx + r * Math.cos(angle), yi1 = cy + r * Math.sin(angle);
-    const xi2 = cx + r * Math.cos(angle + sweep), yi2 = cy + r * Math.sin(angle + sweep);
-    const large = sweep > Math.PI ? 1 : 0;
+    const midAngle = angle + sweep / 2;
+    const isLargest = i === 0;
+    const explode = isLargest ? explodeAmount * 1.4 : explodeAmount;
+    const ox = Math.cos(midAngle) * explode;
+    const oy = Math.sin(midAngle) * explode;
+    const a1 = angle + gap / 2;
+    const a2 = angle + sweep - gap / 2;
+    const large = sweep - gap > Math.PI ? 1 : 0;
+    // Outer arc
+    const x1 = cx + ox + R * Math.cos(a1), y1 = cy + oy + R * Math.sin(a1);
+    const x2 = cx + ox + R * Math.cos(a2), y2 = cy + oy + R * Math.sin(a2);
+    // Inner arc
+    const xi1 = cx + ox + r * Math.cos(a1), yi1 = cy + oy + r * Math.sin(a1);
+    const xi2 = cx + ox + r * Math.cos(a2), yi2 = cy + oy + r * Math.sin(a2);
     const d = `M ${x1} ${y1} A ${R} ${R} 0 ${large} 1 ${x2} ${y2} L ${xi2} ${yi2} A ${r} ${r} 0 ${large} 0 ${xi1} ${yi1} Z`;
+    // Label inside segment if wide enough
+    const pct = Math.round(count / total * 100);
+    const labelR = (R + r) / 2;
+    const labelX = cx + ox + labelR * Math.cos(midAngle);
+    const labelY = cy + oy + labelR * Math.sin(midAngle);
+    const showLabel = sweep - gap > 0.45;
+    // Gradient id
+    const gradId = `${uid}_g${i}`;
     angle += sweep;
-    return { d, color: pkg.color, tint: pkg.tint, label: pkg.label, count };
+    return { d, color: pkg.color, tint: pkg.tint, label: pkg.label, count,
+             pct, labelX, labelY, showLabel, isLargest, gradId, midAngle };
   });
 
-  canvas.outerHTML = `<svg id="reportPieChart" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="max-width:100%;display:block;margin:0 auto;">
-    ${slices.map((s,i) => `<path d="${s.d}" fill="${s.tint}" stroke="${s.color}" stroke-width="2" stroke-linejoin="round">
-      <title>${s.label}: ${s.count} booking${s.count !== 1 ? 's' : ''} (${Math.round(s.count/total*100)}%)</title>
-    </path>`).join('')}
-    <circle cx="${cx}" cy="${cy}" r="${r - 4}" fill="white"/>
-    <text x="${cx}" y="${cy - 6}" text-anchor="middle" font-size="18" font-weight="800" fill="#000">${total}</text>
-    <text x="${cx}" y="${cy + 12}" text-anchor="middle" font-size="10" font-weight="700" fill="#888">PACKAGES</text>
-  </svg>`;
+  // Build defs for gradients and shadows
+  const defs = `<defs>
+    <filter id="${uid}_shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="rgba(0,0,0,0.18)" flood-opacity="1"/>
+    </filter>
+    ${slices.map(s => `
+      <radialGradient id="${s.gradId}" cx="40%" cy="35%" r="65%">
+        <stop offset="0%" stop-color="${s.color}" stop-opacity="0.45"/>
+        <stop offset="100%" stop-color="${s.color}" stop-opacity="0.9"/>
+      </radialGradient>`).join('')}
+  </defs>`;
 
+  // Center circle white + subtle shadow
+  const centerR = r - 6;
+
+  // SVG string
+  const svgContent = `${defs}
+    <circle cx="${cx}" cy="${cy}" r="${centerR + 4}" fill="rgba(0,0,0,0.06)"/>
+    ${slices.map((s, i) => `
+    <g style="cursor:pointer;transition:transform .18s cubic-bezier(.34,1.56,.64,1);"
+       onmouseenter="this.style.transform='scale(1.04)';this.style.transformOrigin='${Math.round(s.labelX)}px ${Math.round(s.labelY)}px'"
+       onmouseleave="this.style.transform=''"
+       ontouchstart="this.style.transform='scale(1.04)';this.style.transformOrigin='${Math.round(s.labelX)}px ${Math.round(s.labelY)}px'"
+       ontouchend="setTimeout(()=>this.style.transform='',300)">
+      <path d="${s.d}" fill="url(#${s.gradId})" stroke="#fff" stroke-width="${s.isLargest ? 2.5 : 1.8}" stroke-linejoin="round"
+            filter="url(#${uid}_shadow)">
+        <title>${s.label}: ${s.count} pax (${s.pct}%)</title>
+      </path>
+      ${s.showLabel ? `<text x="${s.labelX.toFixed(1)}" y="${(s.labelY + 4).toFixed(1)}"
+        text-anchor="middle" font-size="${s.isLargest ? 13 : 11}" font-weight="800"
+        fill="#fff" style="pointer-events:none;text-shadow:0 1px 2px rgba(0,0,0,0.3);">${s.pct}%</text>` : ''}
+    </g>`).join('')}
+    <!-- White center hole -->
+    <circle cx="${cx}" cy="${cy}" r="${centerR}" fill="#fff"/>
+    <text x="${cx}" y="${cy - 7}" text-anchor="middle" font-size="20" font-weight="800" fill="#111">${total}</text>
+    <text x="${cx}" y="${cy + 12}" text-anchor="middle" font-size="10" font-weight="700" letter-spacing="0.08em" fill="#999">PACKAGES</text>`;
+
+  canvas.outerHTML = `<svg id="reportPieChart"
+    width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"
+    style="max-width:100%;display:block;margin:0 auto;overflow:visible;">${svgContent}</svg>`;
+
+  // Legend — sorted same as slices
   legendEl.innerHTML = entries.map(([k, count]) => {
     const pkg = PACKAGES[k] || PACKAGES.Others;
     const pct = Math.round(count / total * 100);
-    return `<div style="display:flex;align-items:center;gap:6px;padding:3px 0;">
-      <span style="width:10px;height:10px;border-radius:2px;background:${pkg.color};flex:none;"></span>
-      <span style="font-size:11.5px;font-weight:700;color:#000;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${pkg.label}</span>
-      <span style="font-size:11.5px;font-weight:800;color:#000;white-space:nowrap;">${count} <span style="color:#888;">(${pct}%)</span></span>
+    return `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid #f0f0f0;">
+      <span style="width:12px;height:12px;border-radius:4px;background:${pkg.color};flex:none;box-shadow:0 1px 3px rgba(0,0,0,0.15);"></span>
+      <span style="font-size:12px;font-weight:700;color:#111;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${pkg.label}</span>
+      <span style="font-size:12px;font-weight:800;color:#111;white-space:nowrap;">${count} <span style="color:#999;font-weight:600;">(${pct}%)</span></span>
     </div>`;
   }).join('');
+  legendEl.style.marginTop = '16px';
+  legendEl.style.display = 'flex';
+  legendEl.style.flexDirection = 'column';
 }
 
 function exportReportToExcel(){
@@ -2278,13 +2398,13 @@ function renderContentStatusChips(){
   const opts = [['all', 'All']].concat(CONTENT_STATUSES.map(s => [s, s]));
   el.innerHTML = opts.map(([key, label]) => {
     const active = contentStatusFilter === key;
-    let styleAttr = '';
+    let styleAttr = 'font-size:11px;padding:5px 10px;border-radius:20px;border-width:1.5px;transition:all .15s ease;';
     if(active){
       if(key === 'all'){
-        styleAttr = `background:var(--bg);border-color:#000;color:#000;`;
+        styleAttr += `background:#111;border-color:#111;color:#fff;`;
       } else {
         const st = CONTENT_STATUS_STYLES[key];
-        styleAttr = `background:${st.bg};border-color:${st.border};color:#000;`;
+        styleAttr += `background:${st.bg};border-color:${st.border};color:#000;`;
       }
     }
     return `<button class="filter-chip ${active ? 'active' : ''}" style="${styleAttr}" onclick="setContentStatusFilter('${key}')">${label}</button>`;
@@ -2367,15 +2487,18 @@ function renderContentList(){
     return `
       <div class="content-row">
         <div class="content-row-left">
-          <div class="content-name">${escapeHtml(b.clientName)}${b.igAccount ? ' (' + escapeHtml(b.igAccount) + ')' : ''}</div>
-          <div class="content-pkg" style="color:${pkg.color}">${pkg.label} · ${formatDateLong(b.date)}</div>
+          <div class="content-name">${escapeHtml(b.clientName)}${b.igAccount ? `<span style="font-size:12px;font-weight:700;color:var(--ink-soft);"> (${escapeHtml(b.igAccount)})</span>` : ''}</div>
+          <div class="content-pkg">
+            <span style="display:inline-block;background:${pkg.tint};color:${pkg.color};font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:20px;margin-right:5px;">${pkg.label}</span>
+            <span style="color:var(--ink-soft);font-size:11.5px;font-weight:700;">${formatDateLong(b.date)}</span>
+          </div>
         </div>
         <select class="content-status-select" style="background:${style.bg};border-color:${style.border};" onchange="updateContentStatus('${b.id}', this.value)">${options}</select>
       </div>
     `;
   }).join('');
 
-  container.innerHTML = `<div class="list-card" style="padding:4px 14px;">${rows}</div>`;
+  container.innerHTML = `<div style="padding:0;">${rows}</div>`;
 }
 
 /* ================= MODAL HELPERS ================= */
