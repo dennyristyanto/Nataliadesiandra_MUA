@@ -1416,6 +1416,14 @@ function formatThousands(el){
   const raw = el.value.replace(/[^0-9]/g, '');
   el.value = raw ? Number(raw).toLocaleString('en-US') : '';
 }
+function updateTeamCostVisibility(){
+  const pkg = (document.getElementById('f_package') || {}).value || '';
+  const handled = (document.getElementById('f_handledBy') || {}).value || '';
+  const show = pkg === 'Diamond Wedding' || handled === 'Team';
+  const wrap = document.getElementById('f_teamAllocationWrap');
+  if(wrap) wrap.style.display = show ? '' : 'none';
+}
+
 function recheckFullPaymentStage(){
   const stageSel = document.getElementById('f_depositStage');
   const depositEl = document.getElementById('f_depositAmount');
@@ -2069,44 +2077,30 @@ function computeReportFinancials(filtered){
       isCancelledView, totalRevenue,
       operatingCost: 0, developmentCost: 0, hairdoCost: 0,
       transportationCost: 0, transportRevenueTotal: 0,
-      teamCost: 0, teamRevenue: 0,
+      teamCost: 0,
       profit: -totalRevenue,
     };
   }
 
-  const teamBookings = filtered.filter(b => b.handledBy === 'Team');
-  const normalBookings = filtered.filter(b => b.handledBy !== 'Team');
-
-  const teamRevenue = teamBookings.reduce((sum, b) => sum + bookingBasePrice(b), 0);
-  const normalRevenue = normalBookings.reduce((sum, b) => sum + bookingBasePrice(b), 0);
+  const normalRevenue = totalRevenue;
 
   const operatingCost = normalRevenue * 0.15;
   const developmentCost = normalRevenue * 0.10;
-  const hairdoCost = normalBookings.reduce((sum, b) => sum + (Number(b.hairdoPrice) || 0), 0);
-  const transportRevenueTotal = normalBookings.reduce((sum, b) => sum + (Number(b.transportFee) || 0), 0);
+  const hairdoCost = filtered.reduce((sum, b) => sum + (Number(b.hairdoPrice) || 0), 0);
+  const transportRevenueTotal = filtered.reduce((sum, b) => sum + (Number(b.transportFee) || 0), 0);
   const transportationCost = transportRevenueTotal * 0.80;
 
-  const teamCostBase = teamRevenue * 0.90;
-  const teamProfitShare = teamRevenue * 0.10;
+  // Team Cost = sum of manual teamAllocation field from each booking
+  const teamCost = filtered.reduce((sum, b) => sum + (Number(b.teamAllocation) || 0), 0);
 
-  // Diamond Wedding 26% allocation applies to ALL Diamond Wedding bookings (not only Team)
-  const diamondCost = filtered.reduce((sum, b) => {
-    if(b.package === 'Diamond Wedding'){
-      const basePrice = Number(b.price) || 0; // Package Price only, not fees
-      return sum + basePrice * 0.26;
-    }
-    return sum;
-  }, 0);
-
-  const teamCost = teamCostBase + diamondCost;
-  const normalProfit = normalRevenue - operatingCost - developmentCost - hairdoCost - transportationCost;
+  const profit = normalRevenue - operatingCost - developmentCost - hairdoCost - transportationCost - teamCost;
 
   return {
     isCancelledView, totalRevenue,
     operatingCost, developmentCost, hairdoCost,
     transportationCost, transportRevenueTotal,
-    teamCost, teamRevenue, diamondCost,
-    profit: normalProfit + teamProfitShare - diamondCost,
+    teamCost,
+    profit,
   };
 }
 
@@ -2115,7 +2109,7 @@ function renderReport(){
 
   const filtered = getReportFilteredBookings();
   const fin = computeReportFinancials(filtered);
-  const { totalRevenue, isCancelledView, operatingCost, developmentCost, hairdoCost, transportationCost, transportRevenueTotal, teamCost, teamRevenue } = fin;
+  const { totalRevenue, isCancelledView, operatingCost, developmentCost, hairdoCost, transportationCost, transportRevenueTotal, teamCost } = fin;
   const profit = fin.profit;
 
   const statsEl = document.getElementById('reportStats');
@@ -2178,7 +2172,7 @@ function renderReport(){
         <span>Transportation Cost (80%)</span>
         <b>${formatRupiah(transportationCost)}</b>
       </div>` : ''}
-      ${teamRevenue > 0 ? `
+      ${teamCost > 0 ? `
       <div class="finance-row">
         <span>Team Cost</span>
         <b>${formatRupiah(teamCost)}</b>
@@ -2351,7 +2345,7 @@ function exportReportToExcel(){
     { Metric: 'Development Cost (10%)', Value: fin.developmentCost },
     { Metric: 'Hairdo Cost', Value: fin.hairdoCost },
     { Metric: 'Transportation Cost (80%)', Value: fin.transportationCost },
-    { Metric: 'Team Cost (90%)', Value: fin.teamCost },
+    { Metric: 'Team Cost', Value: fin.teamCost },
     { Metric: 'Profit', Value: fin.profit },
   ];
 
@@ -2985,7 +2979,7 @@ function openBookingForm(bookingId, presetDate, prefillData){
     id: '', date: presetDate || toDateStr(today.getFullYear(), today.getMonth(), today.getDate()), time: '', timeEnd: '',
     package: 'Signature Wedding', clientName: '', phone: '', venue: '', hairdo: '',
     price: '', depositAmount: '', depositStage: '', note: '', internalNotes: '',
-    retouch: '', igAccount: '', age: '', totalPax: '', look: '', hairdoPrice: '', homeServiceFee: '', transportFee: '', othersFee: '',
+    retouch: '', igAccount: '', age: '', totalPax: '', look: '', hairdoPrice: '', homeServiceFee: '', transportFee: '', othersFee: '', teamAllocation: '',
     allDay: false, handledBy: 'Nataliadesiandra'
   };
   if(!editing && prefillData){
@@ -3024,7 +3018,7 @@ function openBookingForm(bookingId, presetDate, prefillData){
               </div>
               <div>
                 <label style="display:block;font-size:11.5px;font-weight:700;color:#000;margin-bottom:3px;">Handled By</label>
-                <select id="f_handledBy" style="width:100%;padding:7px 8px;font-size:13px;font-weight:700;border-radius:8px;border:1.5px solid var(--line);background:#fff;color:#000;box-sizing:border-box;appearance:none;-webkit-appearance:none;background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:right 8px center;padding-right:24px;">
+                <select id="f_handledBy" onchange="updateTeamCostVisibility()" style="width:100%;padding:7px 8px;font-size:13px;font-weight:700;border-radius:8px;border:1.5px solid var(--line);background:#fff;color:#000;box-sizing:border-box;appearance:none;-webkit-appearance:none;background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:right 8px center;padding-right:24px;">
                   <option value="Nataliadesiandra" ${!b.handledBy || b.handledBy === 'Nataliadesiandra' ? 'selected' : ''}>Nataliadesiandra</option>
                   <option value="Team" ${b.handledBy === 'Team' ? 'selected' : ''}>Team</option>
                 </select>
@@ -3055,7 +3049,7 @@ function openBookingForm(bookingId, presetDate, prefillData){
 
             <div class="field">
               <label>Package Type</label>
-              <select id="f_package">${pkgOptions}</select>
+              <select id="f_package" onchange="updateTeamCostVisibility()">${pkgOptions}</select>
             </div>
 
             <div class="field">
@@ -3138,9 +3132,15 @@ function openBookingForm(bookingId, presetDate, prefillData){
               </div>
             </div>
 
-            <div class="field">
-              <label>Others</label>
-              <input type="text" inputmode="numeric" id="f_othersFee" value="${groupThousands(b.othersFee)}" placeholder="0" oninput="formatThousands(this);recheckFullPaymentStage();">
+            <div class="row2">
+              <div class="field">
+                <label>Others</label>
+                <input type="text" inputmode="numeric" id="f_othersFee" value="${groupThousands(b.othersFee)}" placeholder="0" oninput="formatThousands(this);recheckFullPaymentStage();">
+              </div>
+              <div class="field" id="f_teamAllocationWrap" style="display:none;">
+                <label>Team Cost (internal only)</label>
+                <input type="text" inputmode="numeric" id="f_teamAllocation" value="${groupThousands(b.teamAllocation)}" placeholder="0" oninput="formatThousands(this);">
+              </div>
             </div>
 
             <hr class="hr">
@@ -3195,6 +3195,8 @@ function openBookingForm(bookingId, presetDate, prefillData){
       submitBookingForm(e, editingIdForBind);
     });
   }
+  // Set initial Team Cost visibility based on current values
+  updateTeamCostVisibility();
 }
 
 async function submitBookingForm(evt, editingId){
@@ -3232,6 +3234,11 @@ async function submitBookingForm(evt, editingId){
     othersFee: (() => {
       const raw = document.getElementById('f_othersFee').value.replace(/[^0-9]/g, '');
       return raw ? Number(raw) : null;
+    })(),
+    teamAllocation: (() => {
+      const el = document.getElementById('f_teamAllocation');
+      const raw = el ? el.value.replace(/[^0-9]/g, '') : '';
+      return raw ? Number(raw) : 0;
     })(),
     depositAmount: (() => {
       const raw = document.getElementById('f_depositAmount').value.replace(/[^0-9]/g, '');
