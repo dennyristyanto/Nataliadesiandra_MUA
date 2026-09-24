@@ -733,108 +733,6 @@ body{
 .history-date{font-size:11.5px;font-weight:700;color:#000;margin-top:2px;}
 
 /* ---------- Profile view ---------- */
-.profile-hero{
-  background:linear-gradient(150deg, var(--rose), var(--rose-dark) 75%);
-  border-radius:26px;
-  padding:40px 20px 30px;
-  text-align:center;
-  box-shadow:0 16px 34px rgba(168,49,74,0.28);
-  position:relative;
-  overflow:hidden;
-}
-.profile-hero::before{
-  content:'';
-  position:absolute;
-  top:-60px; right:-60px;
-  width:180px; height:180px;
-  border-radius:50%;
-  background:rgba(255,255,255,0.08);
-}
-.profile-hero::after{
-  content:'';
-  position:absolute;
-  bottom:-70px; left:-40px;
-  width:160px; height:160px;
-  border-radius:50%;
-  background:rgba(255,255,255,0.06);
-}
-.profile-avatar{
-  width:104px;height:104px;
-  border-radius:50%;
-  background:rgba(255,255,255,0.25);
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;
-  overflow:hidden;
-  border:3px solid #fff;
-  box-shadow:0 6px 18px rgba(0,0,0,0.2);
-  margin:0 auto;
-  position:relative;
-  z-index:1;
-}
-.profile-avatar img{width:100%;height:100%;object-fit:cover;}
-.profile-avatar span{
-  color:#fff;font-size:38px;font-weight:700;
-  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;
-}
-.profile-hero-name{
-  margin-top:16px;
-  font-size:19px;
-  font-weight:800;
-  color:#fff;
-  position:relative;
-  z-index:1;
-}
-.profile-ig-badge{
-  margin-top:10px;
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  font-size:13px;
-  font-weight:700;
-  color:#fff;
-  text-decoration:none;
-  padding:7px 14px;
-  border-radius:999px;
-  background:rgba(255,255,255,0.18);
-  border:1px solid rgba(255,255,255,0.35);
-  position:relative;
-  z-index:1;
-}
-.profile-ig-badge svg{stroke:#fff;fill:none;stroke-width:1.8;}
-.profile-hero-hint{
-  margin-top:12px;
-  font-size:11px;
-  font-weight:700;
-  color:rgba(255,255,255,0.85);
-  position:relative;
-  z-index:1;
-}
-.profile-settings{padding:4px 16px;}
-.settings-row{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:14px 0;
-  border-bottom:1px solid var(--line);
-  width:100%;
-  background:none;
-  border-left:none;border-right:none;border-top:none;
-  text-align:left;
-  font-family:inherit;
-}
-.settings-row:last-child{border-bottom:none;}
-.settings-row-btn{cursor:pointer;}
-.settings-row-icon{
-  width:34px;height:34px;
-  border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
-  flex:none;
-}
-.settings-row-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;}
-.settings-row-text{flex:1;min-width:0;}
-.settings-row-label{font-size:14px;font-weight:700;color:#000;}
-.settings-row-value{font-size:13.5px;font-weight:800;color:#000;}
-.settings-row-chevron{font-size:19px;color:#000;font-weight:700;}
 .preview-row{
   display:flex;
   justify-content:space-between;
@@ -1254,39 +1152,6 @@ body{
     </div>
 
     <div id="contentListContainer" style="margin-top:14px;"></div>
-  </div>
-      <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="handleProfilePhotoUpload(event)">
-      <div class="profile-hero-name">Nataliadesiandra MUA</div>
-      <a class="profile-ig-badge" href="https://instagram.com/nataliadesiandramua" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" width="14" height="14"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.2" cy="6.8" r="0.9" fill="currentColor" stroke="none"/></svg>
-        @nataliadesiandramua
-      </a>
-      <p class="profile-hero-hint">Tap the photo to change it</p>
-    </div>
-
-    <div class="list-card profile-settings" style="margin-top:16px;">
-      <div class="settings-row">
-        <div class="settings-row-icon" style="background:var(--rose-tint);color:var(--rose-dark);">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2"/><path d="M5 19c1.2-3.4 3.6-5 7-5s5.8 1.6 7 5"/></svg>
-        </div>
-        <div class="settings-row-text"><div class="settings-row-label">User ID</div></div>
-        <div class="settings-row-value" id="profileUsernameDisplay">-</div>
-      </div>
-      <button type="button" class="settings-row settings-row-btn" onclick="openChangePasswordModal()">
-        <div class="settings-row-icon" style="background:var(--dusk-tint);color:var(--dusk);">
-          <svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="9" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-        </div>
-        <div class="settings-row-text"><div class="settings-row-label">Change Password</div></div>
-        <span class="settings-row-chevron">›</span>
-      </button>
-      <button type="button" class="settings-row settings-row-btn" onclick="confirmLogout()">
-        <div class="settings-row-icon" style="background:#FBD9E1;color:#C0392B;">
-          <svg viewBox="0 0 24 24"><path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3"/><path d="M15 8l4 4-4 4"/><path d="M19 12H9"/></svg>
-        </div>
-        <div class="settings-row-text"><div class="settings-row-label" style="color:#C0392B;">Log Out</div></div>
-        <span class="settings-row-chevron">›</span>
-      </button>
-    </div>
   </div>
 </div>
 
@@ -3690,47 +3555,6 @@ function downloadInvoicePDF(bookingId, forcePelunasan){
   doc.save(`${invNumber}.pdf`);
 }
 
-/* ================= PROFILE ================= */
-let profilePhotoDataUrl = null;
-
-async function loadProfilePhoto(){
-  if(!storageAvailable) return;
-  try{
-    const res = await window.storage.get('profilePhoto', false);
-    if(res && res.value) profilePhotoDataUrl = res.value;
-  }catch(e){ /* no photo saved yet */ }
-  renderProfileAvatar();
-}
-
-function renderProfileAvatar(){
-  const el = document.getElementById('profileAvatar');
-  if(!el) return;
-  el.innerHTML = profilePhotoDataUrl
-    ? `<img src="${profilePhotoDataUrl}" alt="Foto profil">`
-    : `<span>N</span>`;
-}
-
-function triggerProfilePhotoUpload(){
-  const input = document.getElementById('profilePhotoInput');
-  if(input) input.click();
-}
-
-function handleProfilePhotoUpload(evt){
-  const file = evt.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = async () => {
-    profilePhotoDataUrl = reader.result;
-    renderProfileAvatar();
-    if(storageAvailable){
-      try{ await window.storage.set('profilePhoto', profilePhotoDataUrl, false); }
-      catch(e){ console.error('Gagal menyimpan foto profil', e); }
-    }
-  };
-  reader.readAsDataURL(file);
-  evt.target.value = '';
-}
-
 /* ================= LOGIN / ACCOUNT ================= */
 const DEFAULT_CREDENTIALS = { username: 'natalia', password: 'mua2026' };
 let appAccount = null;
@@ -3799,11 +3623,6 @@ function bindAuthEventsOnce(){
   if(signupForm) signupForm.addEventListener('submit', attemptSignup);
   if(signupBtn) signupBtn.addEventListener('click', (e) => { e.preventDefault(); attemptSignup(e); });
   if(loginBtn) loginBtn.addEventListener('click', (e) => { e.preventDefault(); attemptLogin(e); });
-}
-
-function renderProfileAccountInfo(){
-  const el = document.getElementById('profileUsernameDisplay');
-  if(el) el.textContent = appAccount ? appAccount.username : '-';
 }
 
 function confirmLogout(){
