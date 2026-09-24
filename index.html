@@ -4022,7 +4022,7 @@ function openBookingForm(bookingId, presetDate, prefillData){
             <div class="row2">
               <div class="field">
                 <label>Hairdo</label>
-                <input type="text" id="f_hairdo" value="${escapeHtml(b.hairdo || '')}" placeholder="Enter hairdo name">
+                <input type="text" id="f_hairdo" value="${escapeHtml(b.hairdo || '')}" placeholder="Enter hairdo name" style="background:#fff;box-shadow:0 1px 4px rgba(60,30,10,0.08);" onfocus="this.style.borderColor='var(--rose)'" onblur="this.style.borderColor=''">
               </div>
               <div class="field">
                 <label>Allocation (internal only)</label>
