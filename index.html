@@ -163,7 +163,7 @@ body{
 .brand-text p{
   margin:2px 0 0;
   font-size:11.5px;
-  color:rgba(235,204,145,0.80);
+  color:#FFFDF8;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .btn{
@@ -2024,7 +2024,7 @@ function formatTimeRange(b){
   return b.timeEnd ? `${b.time} - ${b.timeEnd}` : b.time;
 }
 function bookingsOnDate(dateStr){
-  return bookings.filter(b => b.date === dateStr && !b.cancelled && !b.done);
+  return bookings.filter(b => b.date === dateStr && !b.cancelled);
 }
 function isPastDateTime(b){
   const now = new Date();
@@ -2157,7 +2157,9 @@ function renderCalendar(){
 
       const nameLines = shown.map(b => {
         let color;
-        if(b.handledBy === 'Team'){
+        if(b.done){
+          color = '#5f5a56'; // Done — dark grey, overrides all other colors
+        } else if(b.handledBy === 'Team'){
           color = '#7C3AED';
         } else {
           const hasDeposit = (b.depositAmount && b.depositAmount > 0) || b.depositStage === 'Full Payment';
