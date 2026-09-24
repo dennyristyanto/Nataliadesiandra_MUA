@@ -750,21 +750,20 @@ body{
 }
 
 /* Actions — 2 rows, champagne style matching reference */
-.bc-actions{display:flex;flex-direction:column;gap:8px;}
-.bc-actions-row{display:flex;gap:8px;}
+.bc-actions{display:flex;flex-direction:column;gap:6px;}
+.bc-actions-row{display:flex;gap:6px;}
 .bc-actions-row .bc-btn{
   flex:1;
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  padding:0 8px;height:46px;
-  border-radius:14px;border:none;cursor:pointer;
-  font-family:inherit;font-size:12px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  padding:0 8px;height:42px;
+  border-radius:10px;border:none;cursor:pointer;
+  font-family:inherit;font-size:11.5px;font-weight:700;
   white-space:nowrap;overflow:hidden;
   transition:transform .15s ease, box-shadow .15s ease;
   -webkit-tap-highlight-color:transparent;
   letter-spacing:0.01em;
 }
 .bc-actions-row .bc-btn:active{transform:scale(0.97);}
-.bc-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;flex:none;}
 
 /* 4 gold-champagne buttons — like reference */
 .bc-btn-invoice,.bc-btn-confirm,.bc-btn-preview,.bc-btn-edit{
@@ -3536,28 +3535,13 @@ function bookingCardHtml(b){
         </div>
         <div class="bc-actions">
           <div class="bc-actions-row">
-            <button class="bc-btn bc-btn-invoice" onclick="openInvoice('${b.id}')">
-              <svg viewBox="0 0 16 16"><rect x="2" y="1" width="10" height="14" rx="1.5"/><path d="M5 5h6M5 8h6M5 11h4"/><path d="M12 4l2 2-2 2" stroke-linecap="round"/></svg>
-              Create Invoice
-            </button>
-            <button class="bc-btn bc-btn-confirm" onclick="openBookingConfirmation('${b.id}')">
-              <svg viewBox="0 0 16 16"><rect x="1" y="2" width="14" height="13" rx="2"/><path d="M5 1v2M11 1v2M1 7h14"/><path d="M5 10l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              Booking Confirmation
-            </button>
+            <button class="bc-btn bc-btn-invoice" onclick="openInvoice('${b.id}')">Create Invoice</button>
+            <button class="bc-btn bc-btn-confirm" onclick="openBookingConfirmation('${b.id}')">Booking Confirmation</button>
           </div>
           <div class="bc-actions-row">
-            <button class="bc-btn bc-btn-preview" onclick="openBookingPreview('${b.id}')">
-              <svg viewBox="0 0 16 16"><ellipse cx="8" cy="8" rx="7" ry="4.5"/><circle cx="8" cy="8" r="2"/></svg>
-              Preview
-            </button>
-            <button class="bc-btn bc-btn-edit" onclick="openBookingForm('${b.id}')">
-              <svg viewBox="0 0 16 16"><path d="M11 2l3 3-8 8H3v-3L11 2z" stroke-linejoin="round"/></svg>
-              Edit
-            </button>
-            <button class="bc-btn bc-btn-cancel" onclick="cancelBooking('${b.id}')">
-              <svg viewBox="0 0 16 16"><path d="M5 5l6 6M11 5l-6 6" stroke-linecap="round"/></svg>
-              Cancel
-            </button>
+            <button class="bc-btn bc-btn-preview" onclick="openBookingPreview('${b.id}')">Preview</button>
+            <button class="bc-btn bc-btn-edit" onclick="openBookingForm('${b.id}')">Edit</button>
+            <button class="bc-btn bc-btn-cancel" onclick="cancelBooking('${b.id}')">Cancel</button>
           </div>
         </div>
         ${b.done
