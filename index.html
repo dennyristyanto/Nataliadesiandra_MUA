@@ -648,8 +648,57 @@ body{
   padding:5px 12px;border-radius:20px;
   border:1px solid rgba(39,120,70,0.15);
 }
-/* Actions */
-.bc-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
+/* Actions — 2 rows */
+.bc-actions{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
+.bc-actions-row{display:flex;gap:6px;}
+.bc-actions-row .bc-btn{
+  flex:1;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  padding:0 6px;height:44px;
+  border-radius:10px;border:none;cursor:pointer;
+  font-family:inherit;font-size:11px;font-weight:700;
+  white-space:nowrap;overflow:hidden;
+  transition:transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.bc-actions-row .bc-btn:active{transform:scale(0.95);}
+.bc-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;flex:none;}
+/* Row 1 styles */
+.bc-btn-invoice{
+  background:linear-gradient(135deg,#C9913A 0%,#A07028 100%);
+  color:#FFF8E0;border:1.5px solid rgba(160,112,40,0.4);
+  box-shadow:0 2px 6px rgba(130,80,10,0.20), inset 0 0.5px 0 rgba(255,235,150,0.3);
+}
+.bc-btn-confirm{
+  background:linear-gradient(135deg,#C9913A 0%,#A07028 100%);
+  color:#FFF8E0;border:1.5px solid rgba(160,112,40,0.4);
+  box-shadow:0 2px 6px rgba(130,80,10,0.20), inset 0 0.5px 0 rgba(255,235,150,0.3);
+}
+/* Row 2 styles */
+.bc-btn-preview{
+  background:linear-gradient(135deg,#C9913A 0%,#A07028 100%);
+  color:#FFF8E0;border:1.5px solid rgba(160,112,40,0.4);
+  box-shadow:0 2px 6px rgba(130,80,10,0.20), inset 0 0.5px 0 rgba(255,235,150,0.3);
+}
+.bc-btn-edit{
+  background:linear-gradient(135deg,#C9913A 0%,#A07028 100%);
+  color:#FFF8E0;border:1.5px solid rgba(160,112,40,0.4);
+  box-shadow:0 2px 6px rgba(130,80,10,0.20), inset 0 0.5px 0 rgba(255,235,150,0.3);
+}
+.bc-btn-cancel{
+  background:linear-gradient(135deg,#B42F52 0%,#7A1A30 100%);
+  color:#fff;border:1.5px solid rgba(140,30,55,0.45);
+  box-shadow:0 2px 6px rgba(140,30,55,0.25), inset 0 0.5px 0 rgba(255,180,180,0.2);
+}
+/* Active/press darkens gradient */
+.bc-btn-invoice:active,.bc-btn-confirm:active,.bc-btn-preview:active,.bc-btn-edit:active{
+  background:linear-gradient(135deg,#A87828 0%,#885818 100%);
+  box-shadow:0 1px 3px rgba(130,80,10,0.18);
+}
+.bc-btn-cancel:active{
+  background:linear-gradient(135deg,#8B2040 0%,#5A1020 100%);
+  box-shadow:0 1px 3px rgba(100,20,40,0.2);
+}
 /* Done button/badge */
 .bc-done-btn{margin-top:10px;}
 .bc-done-badge{
@@ -674,6 +723,7 @@ body{
   padding:16px;
   box-shadow:var(--shadow-sm);
   border:1px solid rgba(220,185,148,0.3);
+  overflow:visible;
 }
 .filter-chips{display:flex;gap:8px;flex-wrap:wrap;}
 .filter-chip{
@@ -740,20 +790,23 @@ body{
   transition:transform .15s ease, box-shadow .15s ease;
 }
 .stat-card:active{transform:scale(0.98);}
-/* Bookings — warm beige */
+/* Bookings — metallic gold */
 .stat-card-bookings{
-  background:linear-gradient(135deg, #F5EFE7 0%, #EDE0D0 100%);
-  border:1px solid rgba(168,120,80,0.12);
+  background:linear-gradient(135deg, #C9913A 0%, #B07828 50%, #D4A84A 100%);
+  border:1px solid rgba(212,168,74,0.5);
+  box-shadow:0 3px 14px rgba(160,110,30,0.22), inset 0 0.5px 0 rgba(255,235,160,0.4);
 }
-/* Revenue — rose/burgundy */
+/* Revenue — metallic gold */
 .stat-card-revenue{
-  background:linear-gradient(135deg, #F9E8ED 0%, #F0D0DA 100%);
-  border:1px solid rgba(168,49,74,0.12);
+  background:linear-gradient(135deg, #C9913A 0%, #B07828 50%, #D4A84A 100%);
+  border:1px solid rgba(212,168,74,0.5);
+  box-shadow:0 3px 14px rgba(160,110,30,0.22), inset 0 0.5px 0 rgba(255,235,160,0.4);
 }
-/* Profit — gold/green */
+/* Profit — metallic gold full width */
 .stat-card-profit{
-  background:linear-gradient(135deg, #E9F5EE 0%, #D4EAD8 100%);
-  border:1px solid rgba(39,120,70,0.12);
+  background:linear-gradient(135deg, #B07828 0%, #C9913A 40%, #D4A84A 100%);
+  border:1px solid rgba(212,168,74,0.5);
+  box-shadow:0 3px 14px rgba(160,110,30,0.22), inset 0 0.5px 0 rgba(255,235,160,0.4);
 }
 .stat-card-icon{
   width:34px;height:34px;
@@ -762,24 +815,24 @@ body{
   margin-bottom:10px;
   flex:none;
 }
-.stat-card-bookings .stat-card-icon{background:rgba(168,120,80,0.14);}
-.stat-card-revenue  .stat-card-icon{background:rgba(168,49,74,0.12);}
-.stat-card-profit   .stat-card-icon{background:rgba(39,120,70,0.12);}
+.stat-card-bookings .stat-card-icon{background:rgba(255,235,160,0.25);}
+.stat-card-revenue  .stat-card-icon{background:rgba(255,235,160,0.25);}
+.stat-card-profit   .stat-card-icon{background:rgba(255,235,160,0.25);}
 .stat-card-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;}
-.stat-card-bookings .stat-card-icon svg{stroke:#A07040;}
-.stat-card-revenue  .stat-card-icon svg{stroke:var(--rose);}
-.stat-card-profit   .stat-card-icon svg{stroke:#277846;}
-.stat-label{font-size:11px;font-weight:800;letter-spacing:0.02em;text-transform:uppercase;}
-.stat-card-bookings .stat-label{color:#8A6030;}
-.stat-card-revenue  .stat-label{color:#8A2038;}
-.stat-card-profit   .stat-label{color:#1E6035;}
+.stat-card-bookings .stat-card-icon svg{stroke:#FFF3C0;}
+.stat-card-revenue  .stat-card-icon svg{stroke:#FFF3C0;}
+.stat-card-profit   .stat-card-icon svg{stroke:#FFF3C0;}
+.stat-label{font-size:11px;font-weight:800;letter-spacing:0.05em;text-transform:uppercase;}
+.stat-card-bookings .stat-label{color:rgba(255,248,220,0.9);}
+.stat-card-revenue  .stat-label{color:rgba(255,248,220,0.9);}
+.stat-card-profit   .stat-label{color:rgba(255,248,220,0.9);}
 .stat-value{
   font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;
   font-size:20px;font-weight:700;margin-top:4px;line-height:1.15;
 }
-.stat-card-bookings .stat-value{color:#4A3010;}
-.stat-card-revenue  .stat-value{color:#7A1030;}
-.stat-card-profit   .stat-value{color:#145025;}
+.stat-card-bookings .stat-value{color:#FFF8E0;text-shadow:0 1px 3px rgba(120,70,0,0.3);}
+.stat-card-revenue  .stat-value{color:#FFF8E0;text-shadow:0 1px 3px rgba(120,70,0,0.3);}
+.stat-card-profit   .stat-value{color:#FFF8E0;text-shadow:0 1px 3px rgba(120,70,0,0.3);}
 /* Profit card spans full width */
 .stat-card-profit-wrap{grid-column:1/-1;}
 .stat-card-profit-inner{
@@ -1301,7 +1354,56 @@ body{
   .cal-daynum{font-size:8px;}
   .cal-booking-name{font-size:6.5px;}
 }
-/* ---- Report filter — month dropdown ---- */
+/* ---- Bookings filter — 2×2 native select wrapper ---- */
+.bkf-card{overflow:visible;}
+.bkf-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.bkf-wrap{
+  position:relative;
+  display:flex;align-items:center;gap:6px;
+  padding:9px 10px 9px 10px;
+  background:linear-gradient(135deg,var(--ivory) 0%,var(--cream) 100%);
+  border:1.5px solid rgba(200,165,120,0.4);
+  border-radius:12px;
+  box-shadow:0 1px 4px rgba(100,60,20,0.07);
+  transition:border-color .15s ease, box-shadow .15s ease;
+}
+.bkf-wrap:focus-within{
+  border-color:var(--rose);
+  box-shadow:0 0 0 3px rgba(180,47,82,0.09);
+}
+.bkf-icon{
+  width:14px;height:14px;flex:none;
+  stroke:var(--gold-dark);fill:none;pointer-events:none;
+}
+.bkf-select{
+  flex:1;min-width:0;
+  font-size:11.5px;font-weight:700;
+  color:var(--ink);
+  background:transparent;
+  border:none;outline:none;
+  font-family:inherit;
+  cursor:pointer;
+  /* Remove native arrow — we use our own */
+  appearance:none;-webkit-appearance:none;
+  /* Full area clickable */
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  opacity:0;
+  z-index:1;
+}
+/* visible label over the hidden select */
+.bkf-wrap .bkf-label{
+  flex:1;min-width:0;
+  font-size:11.5px;font-weight:700;
+  color:var(--ink);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  pointer-events:none;
+}
+.bkf-chev{
+  width:9px;height:6px;flex:none;
+  stroke:var(--gold-dark);fill:none;pointer-events:none;
+}
+/* Report filter */
 .rf-month-wrap{
   position:absolute;
   top:calc(100% + 4px);
@@ -1311,6 +1413,18 @@ body{
 .rf-month-wrap .cf-menu{
   min-width:200px;
   max-width:calc(100vw - 48px);
+}
+.rf-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.rf-grid .filter-chip{
+  text-align:center;
+  justify-content:center;
+  width:100%;
+  padding:9px 8px;
+  font-size:12.5px;
 }
 </style>
 </head>
@@ -1423,27 +1537,31 @@ body{
 
     <button type="button" class="btn btn-ghost btn-block" id="bookingHistoryBtn" style="margin-bottom:14px;" onclick="openBookingHistory()">Booking History</button>
 
-    <div class="list-card">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <div class="field" style="margin:0;">
-          <label>Filter by Month</label>
-          <select class="content-filter-select" id="bookingsMonthSelect" onchange="onBookingsMonthChange(this)"></select>
+    <div class="list-card bkf-card">
+      <div class="bkf-grid">
+        <div class="bkf-wrap">
+          <svg class="bkf-icon" viewBox="0 0 16 16" fill="none" stroke-width="1.6"><rect x="1" y="2" width="14" height="13" rx="2"/><path d="M5 1v2M11 1v2M1 7h14"/></svg>
+          <span class="bkf-label" id="bkfLblMonth">Month</span>
+          <svg class="bkf-chev" viewBox="0 0 10 6" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M1 1l4 4 4-4"/></svg>
+          <select class="bkf-select" id="bookingsMonthSelect" onchange="onBookingsMonthChange(this)"><option value="all">Month</option></select>
         </div>
-        <div class="field" style="margin:0;">
-          <label>Filter by Payment Stage</label>
-          <select class="content-filter-select" id="filterChips" onchange="setFilter(this.value)"></select>
+        <div class="bkf-wrap">
+          <svg class="bkf-icon" viewBox="0 0 16 16" fill="none" stroke-width="1.6"><circle cx="8" cy="8" r="6"/><path d="M8 5v1.5M8 9.5V11"/></svg>
+          <span class="bkf-label" id="bkfLblStage">Payment Stage</span>
+          <svg class="bkf-chev" viewBox="0 0 10 6" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M1 1l4 4 4-4"/></svg>
+          <select class="bkf-select" id="filterChips" onchange="setFilter(this.value)"><option value="All">Payment Stage</option></select>
         </div>
-        <div class="field" style="margin:0;">
-          <label>Filter by Handled By</label>
-          <select class="content-filter-select" id="bookingsHandledBySelect" onchange="onBookingsHandledByChange(this)">
-            <option value="all">All</option>
-            <option value="Nataliadesiandra">Nataliadesiandra</option>
-            <option value="Team">Team</option>
-          </select>
+        <div class="bkf-wrap">
+          <svg class="bkf-icon" viewBox="0 0 16 16" fill="none" stroke-width="1.6"><circle cx="8" cy="5.5" r="2.5"/><path d="M3 13.5c1-3 8-3 10 0"/></svg>
+          <span class="bkf-label" id="bkfLblHandled">Handled By</span>
+          <svg class="bkf-chev" viewBox="0 0 10 6" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M1 1l4 4 4-4"/></svg>
+          <select class="bkf-select" id="bookingsHandledBySelect" onchange="onBookingsHandledByChange(this)"><option value="all">Handled By</option></select>
         </div>
-        <div class="field" style="margin:0;">
-          <label>Filter by Package</label>
-          <select class="content-filter-select" id="bookingsPackageSelect" onchange="onBookingsPackageChange(this)"></select>
+        <div class="bkf-wrap">
+          <svg class="bkf-icon" viewBox="0 0 16 16" fill="none" stroke-width="1.6"><rect x="2" y="3" width="12" height="10" rx="2"/><path d="M2 7h12M6 3v4"/></svg>
+          <span class="bkf-label" id="bkfLblPackage">Package</span>
+          <svg class="bkf-chev" viewBox="0 0 10 6" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M1 1l4 4 4-4"/></svg>
+          <select class="bkf-select" id="bookingsPackageSelect" onchange="onBookingsPackageChange(this)"><option value="all">Package</option></select>
         </div>
       </div>
     </div>
@@ -1463,7 +1581,7 @@ body{
     </div>
 
     <div class="list-card" style="position:relative;">
-      <div class="filter-chips" id="reportFilterChips"></div>
+      <div id="reportFilterChips" class="rf-grid"></div>
       <!-- Custom month dropdown for report -->
       <div class="rf-month-wrap" id="rfMonthWrap">
         <div class="cf-menu" id="rfMonthMenu" style="display:none;"></div>
@@ -2213,45 +2331,90 @@ function renderBookingsMonthOptions(){
 
 function onBookingsMonthChange(el){
   bookingsMonthFilter = el.value;
+  const lbl = document.getElementById('bkfLblMonth');
+  if(lbl){
+    if(el.value==='all'){lbl.textContent='Month';}
+    else{const[y,mm]=el.value.split('-').map(Number);lbl.textContent=`${MONTHS_ID[mm-1]} ${y}`;}
+  }
   renderBookingsList();
 }
 
-function renderFilterChips(){
-  const el = document.getElementById('filterChips');
+function renderBookingsMonthOptions(){
+  const el = document.getElementById('bookingsMonthSelect');
   if(!el) return;
-  const opts = [['All', 'All']].concat(
-    [['No Deposit Yet', 'No Deposit Yet']],
-    DEPOSIT_STAGES.map(s => [s, s])
-  );
-  el.innerHTML = opts.map(([key, label]) =>
-    `<option value="${key}" ${activeFilter === key ? 'selected' : ''}>${label}</option>`
-  ).join('');
+  const months = [...new Set(bookings.filter(b=>!b.cancelled&&!b.done).map(b=>b.date.slice(0,7)))].sort().reverse();
+  el.innerHTML = `<option value="all">All months</option>` + months.map(m => {
+    const [y, mm] = m.split('-').map(Number);
+    const label = `${MONTHS_ID[mm-1]} ${y}`;
+    return `<option value="${m}" ${bookingsMonthFilter===m?'selected':''}>${label}</option>`;
+  }).join('');
+  // Sync visible label
+  const lbl = document.getElementById('bkfLblMonth');
+  if(lbl){
+    if(bookingsMonthFilter==='all'){lbl.textContent='Month';}
+    else{const[y,mm]=bookingsMonthFilter.split('-').map(Number);lbl.textContent=`${MONTHS_ID[mm-1]} ${y}`;}
+  }
+}
 
-  const pkgEl = document.getElementById('bookingsPackageSelect');
-  if(pkgEl){
-    const pkgOpts = [['all', 'All']].concat(Object.entries(PACKAGES).map(([k,p]) => [k, p.label]));
-    pkgEl.innerHTML = pkgOpts.map(([key, label]) =>
-      `<option value="${key}" ${bookingsPackageFilter === key ? 'selected' : ''}>${label}</option>`
-    ).join('');
+function renderFilterChips(){
+  // Payment Stage select
+  const el = document.getElementById('filterChips');
+  if(el){
+    const opts = [
+      ['All','Payment Stage'],
+      ['No Deposit Yet','No Deposit Yet'],
+      ['Deposit 1','Deposit 1'],
+      ['Deposit 2','Deposit 2'],
+      ['Full Payment','Paid in Full'],
+    ];
+    el.innerHTML = opts.map(([key,label])=>`<option value="${key}" ${activeFilter===key?'selected':''}>${label}</option>`).join('');
+    // Sync visible label
+    const lbl = document.getElementById('bkfLblStage');
+    if(lbl){const found=opts.find(([k])=>k===activeFilter);lbl.textContent=found?found[1]:'Payment Stage';}
   }
 
+  // Handled By — built from live data
   const hbEl = document.getElementById('bookingsHandledBySelect');
-  if(hbEl) hbEl.value = bookingsHandledByFilter;
+  if(hbEl){
+    const hbVals = [...new Set(bookings.filter(b=>!b.cancelled&&!b.done).map(b=>(b.handledBy||'Nataliadesiandra').trim()))].sort();
+    hbEl.innerHTML = `<option value="all">All</option>` + hbVals.map(v=>`<option value="${v}" ${bookingsHandledByFilter===v?'selected':''}>${v}</option>`).join('');
+    // Sync visible label
+    const lbl = document.getElementById('bkfLblHandled');
+    if(lbl) lbl.textContent = bookingsHandledByFilter==='all'?'Handled By':bookingsHandledByFilter;
+  }
+
+  // Package — built from live data
+  const pkgEl = document.getElementById('bookingsPackageSelect');
+  if(pkgEl){
+    const pkgVals = [...new Set(bookings.filter(b=>!b.cancelled&&!b.done&&b.package).map(b=>b.package))];
+    const pkgOpts = [['all','All']].concat(pkgVals.map(k=>[k,(PACKAGES[k]?.label||k)]));
+    pkgEl.innerHTML = pkgOpts.map(([key,label])=>`<option value="${key}" ${bookingsPackageFilter===key?'selected':''}>${label}</option>`).join('');
+    // Sync visible label
+    const lbl = document.getElementById('bkfLblPackage');
+    if(lbl) lbl.textContent = bookingsPackageFilter==='all'?'Package':(PACKAGES[bookingsPackageFilter]?.label||bookingsPackageFilter);
+  }
 }
 
 function setFilter(key){
   activeFilter = key;
+  const labels = {'All':'Payment Stage','No Deposit Yet':'No Deposit Yet','Deposit 1':'Deposit 1','Deposit 2':'Deposit 2','Full Payment':'Paid in Full'};
+  const lbl = document.getElementById('bkfLblStage');
+  if(lbl) lbl.textContent = labels[key]||key;
   renderFilterChips();
   renderBookingsList();
 }
 
 function onBookingsHandledByChange(el){
   bookingsHandledByFilter = el.value;
+  const lbl = document.getElementById('bkfLblHandled');
+  if(lbl) lbl.textContent = el.value==='all'?'Handled By':el.value;
   renderBookingsList();
 }
 
 function onBookingsPackageChange(el){
   bookingsPackageFilter = el.value;
+  const lbl = document.getElementById('bkfLblPackage');
+  if(lbl) lbl.textContent = el.value==='all'?'Package':(PACKAGES[el.value]?.label||el.value);
   renderBookingsList();
 }
 
@@ -2281,7 +2444,7 @@ function renderBookingsList(){
   filtered.sort((a, b) => a.date.localeCompare(b.date) || timeKey(a).localeCompare(timeKey(b)) || a.clientName.localeCompare(b.clientName));
 
   if(filtered.length === 0){
-    container.innerHTML = `<div class="empty-hint" style="padding:36px 10px;">No bookings for this filter.</div>`;
+    container.innerHTML = `<div class="empty-hint" style="padding:36px 10px;">No bookings found.</div>`;
     return;
   }
 
@@ -2326,9 +2489,9 @@ function renderReportFilterChips(){
     return `${MONTHS_ID[mm-1]} ${y}`;
   })();
   const monthPill = `
-    <button class="filter-chip rf-month-pill ${isAllMonth && reportFilter === 'all' ? 'active' : ''}"
+    <button class="filter-chip rf-month-pill ${reportFilter === 'all' ? 'active' : ''}"
       onclick="rfToggleMonthDropdown(this)" id="rfMonthPillBtn"
-      style="display:inline-flex;align-items:center;gap:6px;">
+      style="display:inline-flex;align-items:center;justify-content:center;gap:6px;">
       <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
         <rect x="1" y="2" width="12" height="11" rx="2"/>
         <path d="M4 1v2M10 1v2M1 6h12"/>
@@ -2339,13 +2502,12 @@ function renderReportFilterChips(){
       </svg>
     </button>`;
 
-  const statusOpts = [['booked','Past'],['upcoming','Upcoming'],['cancelled','Cancelled']];
-  const statusPills = statusOpts.map(([key, label]) => {
-    const active = reportFilter === key;
-    return `<button class="filter-chip ${active?'active':''}" onclick="setReportFilter('${key}')">${label}</button>`;
-  }).join('');
+  const past     = `<button class="filter-chip ${reportFilter==='booked'?'active':''}"    onclick="setReportFilter('booked')">Past</button>`;
+  const upcoming = `<button class="filter-chip ${reportFilter==='upcoming'?'active':''}"  onclick="setReportFilter('upcoming')">Upcoming</button>`;
+  const cancelled= `<button class="filter-chip ${reportFilter==='cancelled'?'active':''}" onclick="setReportFilter('cancelled')">Cancelled</button>`;
 
-  el.innerHTML = monthPill + statusPills;
+  // 2×2 grid: [All months][Past] / [Upcoming][Cancelled]
+  el.innerHTML = monthPill + past + upcoming + cancelled;
   renderRfMonthMenu();
 }
 
@@ -2748,6 +2910,108 @@ function getContentMonths(){
 
 
 
+/* ---- Bookings page — 2×2 custom filter dropdowns ---- */
+const BK_FDS = ['bkFdMonth','bkFdStage','bkFdHandled','bkFdPackage'];
+
+function bkToggle(wrapId){
+  const isOpen = document.getElementById(wrapId)?.classList.contains('bk-open');
+  BK_FDS.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.classList.remove('bk-open');const m=el.querySelector('.bk-menu');if(m)m.style.display='none';}
+  });
+  document.querySelectorAll('.cf-dropdown.open').forEach(el=>{
+    el.classList.remove('open');const m=el.querySelector('.cf-menu');if(m)m.style.display='none';
+  });
+  if(!isOpen){
+    const wrap=document.getElementById(wrapId);
+    if(wrap){
+      wrap.classList.add('bk-open');
+      bkPopulateMenu(wrapId);
+      const menu=wrap.querySelector('.bk-menu');
+      const btn=wrap.querySelector('.bk-trigger');
+      if(menu && btn){
+        const r=btn.getBoundingClientRect();
+        menu.style.display='';
+        menu.style.top=(r.bottom+5)+'px';
+        menu.style.left=r.left+'px';
+        menu.style.width=r.width+'px';
+      }
+    }
+  }
+}
+
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.bk-fd')){
+    BK_FDS.forEach(id=>{
+      const el=document.getElementById(id);
+      if(el){el.classList.remove('bk-open');const m=el.querySelector('.bk-menu');if(m)m.style.display='none';}
+    });
+  }
+});
+
+function bkMakeOption(val,label,activeVal,onSelect){
+  const active=val===activeVal;
+  return `<button class="bk-option${active?' bk-active':''}" onclick="(${onSelect})('${val.replace(/'/g,"\\'")}')" type="button">
+    <svg class="bk-check" viewBox="0 0 14 11" fill="none" stroke-width="2"><path d="M1 5l4 4 8-8"/></svg>
+    ${escapeHtml(label)}
+  </button>`;
+}
+
+function getBookingsMonths(){
+  const set=new Set(bookings.filter(b=>!b.cancelled).map(b=>b.date.slice(0,7)));
+  return [...set].sort();
+}
+
+function bkPopulateMenu(wrapId){
+  if(wrapId==='bkFdMonth'){
+    const menu=document.getElementById('bkMenuMonth');if(!menu)return;
+    const months=getBookingsMonths();
+    const opts=[['all','All months']].concat(months.slice().reverse().map(m=>{
+      const [y,mm]=m.split('-').map(Number);return[m,`${MONTHS_ID[mm-1]} ${y}`];
+    }));
+    menu.innerHTML=opts.map(([v,l])=>bkMakeOption(v,l,bookingsMonthFilter,'bkSelectMonth')).join('');
+  } else if(wrapId==='bkFdStage'){
+    const menu=document.getElementById('bkMenuStage');if(!menu)return;
+    const opts=[['All','All'],['No Deposit Yet','No Deposit Yet'],['Deposit 1','Deposit 1'],['Deposit 2','Deposit 2'],['Full Payment','Paid in Full']];
+    menu.innerHTML=opts.map(([v,l])=>bkMakeOption(v,l,activeFilter,'bkSelectStage')).join('');
+  } else if(wrapId==='bkFdHandled'){
+    const menu=document.getElementById('bkMenuHandled');if(!menu)return;
+    const opts=[['all','All'],['Nataliadesiandra','Nataliadesiandra'],['Team','Team']];
+    menu.innerHTML=opts.map(([v,l])=>bkMakeOption(v,l,bookingsHandledByFilter,'bkSelectHandled')).join('');
+  } else if(wrapId==='bkFdPackage'){
+    const menu=document.getElementById('bkMenuPackage');if(!menu)return;
+    const opts=[['all','All']].concat(Object.entries(PACKAGES).map(([k,p])=>[k,p.label]));
+    menu.innerHTML=opts.map(([v,l])=>bkMakeOption(v,l,bookingsPackageFilter,'bkSelectPackage')).join('');
+  }
+}
+
+function bkClose(wrapId,label,labelId){
+  const el=document.getElementById(wrapId);
+  if(el){el.classList.remove('bk-open');const m=el.querySelector('.bk-menu');if(m)m.style.display='none';}
+  const lbl=document.getElementById(labelId);
+  if(lbl)lbl.textContent=label;
+}
+function bkSelectMonth(val){
+  bookingsMonthFilter=val;
+  let lbl='Month';
+  if(val!=='all'){const[y,mm]=val.split('-').map(Number);lbl=`${MONTHS_ID[mm-1]} ${y}`;}
+  bkClose('bkFdMonth',lbl,'bkLblMonth');renderBookingsList();
+}
+function bkSelectStage(val){
+  activeFilter=val;
+  const labels={'All':'Payment Stage','No Deposit Yet':'No Deposit Yet','Deposit 1':'Deposit 1','Deposit 2':'Deposit 2','Full Payment':'Paid in Full'};
+  bkClose('bkFdStage',labels[val]||val,'bkLblStage');renderBookingsList();
+}
+function bkSelectHandled(val){
+  bookingsHandledByFilter=val;
+  bkClose('bkFdHandled',val==='all'?'Handled By':val,'bkLblHandled');renderBookingsList();
+}
+function bkSelectPackage(val){
+  bookingsPackageFilter=val;
+  const label=val==='all'?'Package':(PACKAGES[val]?.label||val);
+  bkClose('bkFdPackage',label,'bkLblPackage');renderBookingsList();
+}
+
 function cfToggle(wrapId){
   const wrap = document.getElementById(wrapId);
   if(!wrap) return;
@@ -3117,11 +3381,30 @@ function bookingCardHtml(b){
           ${remainingHtml}
         </div>
         <div class="bc-actions">
-          <button class="btn btn-ghost btn-sm" onclick="openInvoice('${b.id}')">Create Invoice</button>
-          <button class="btn btn-ghost btn-sm" onclick="openBookingConfirmation('${b.id}')">Booking Confirmation</button>
-          <button class="btn btn-ghost btn-sm" onclick="openBookingPreview('${b.id}')">Preview</button>
-          <button class="btn btn-ghost btn-sm" onclick="openBookingForm('${b.id}')">Edit</button>
-          <button class="btn btn-ghost-danger btn-sm" onclick="cancelBooking('${b.id}')">Cancel</button>
+          <div class="bc-actions-row">
+            <button class="bc-btn bc-btn-invoice" onclick="openInvoice('${b.id}')">
+              <svg viewBox="0 0 16 16"><rect x="2" y="1" width="10" height="14" rx="1.5"/><path d="M5 5h6M5 8h6M5 11h4"/><path d="M12 4l2 2-2 2" stroke-linecap="round"/></svg>
+              Create Invoice
+            </button>
+            <button class="bc-btn bc-btn-confirm" onclick="openBookingConfirmation('${b.id}')">
+              <svg viewBox="0 0 16 16"><rect x="1" y="2" width="14" height="13" rx="2"/><path d="M5 1v2M11 1v2M1 7h14"/><path d="M5 10l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Booking Confirmation
+            </button>
+          </div>
+          <div class="bc-actions-row">
+            <button class="bc-btn bc-btn-preview" onclick="openBookingPreview('${b.id}')">
+              <svg viewBox="0 0 16 16"><ellipse cx="8" cy="8" rx="7" ry="4.5"/><circle cx="8" cy="8" r="2"/></svg>
+              Preview
+            </button>
+            <button class="bc-btn bc-btn-edit" onclick="openBookingForm('${b.id}')">
+              <svg viewBox="0 0 16 16"><path d="M11 2l3 3-8 8H3v-3L11 2z" stroke-linejoin="round"/></svg>
+              Edit
+            </button>
+            <button class="bc-btn bc-btn-cancel" onclick="cancelBooking('${b.id}')">
+              <svg viewBox="0 0 16 16"><path d="M5 5l6 6M11 5l-6 6" stroke-linecap="round"/></svg>
+              Cancel
+            </button>
+          </div>
         </div>
         ${b.done
           ? `<div class="bc-done-badge">Done ✓</div>`
