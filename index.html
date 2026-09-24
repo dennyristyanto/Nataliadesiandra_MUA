@@ -3958,16 +3958,16 @@ function openBookingForm(bookingId, presetDate, prefillData){
     .join('');
 
   showModal(`
-    <div class="overlay" onclick="if(event.target===this) closeModal()">
-      <div class="modal w-md">
-        <div class="modal-head">
+    <div class="preview-overlay" id="bookingFormOverlay" onclick="if(event.target===this){closeModal();document.body.classList.remove('preview-open');}">
+      <div class="preview-modal" style="max-width:min(100%,560px);">
+        <div class="preview-modal-head">
           <div>
             <h2>${editing ? 'Edit Booking' : 'New Booking'}</h2>
             <div class="sub">Enter the client's event details</div>
           </div>
-          <button class="modal-close" onclick="closeModal()">✕</button>
+          <button class="modal-close" onclick="closeModal();document.body.classList.remove('preview-open')">✕</button>
         </div>
-        <div class="modal-body">
+        <div class="preview-modal-body">
           <form id="bookingForm" onsubmit="return submitBookingForm(event, '${editing ? editing.id : ''}')">
 
             <!-- Row 1: Event Date | Handled By -->
@@ -4136,7 +4136,7 @@ function openBookingForm(bookingId, presetDate, prefillData){
             </div>
 
             <div class="form-actions">
-              <button type="button" class="btn btn-ghost" style="flex:1" onclick="closeModal()">Cancel</button>
+              <button type="button" class="btn btn-ghost" style="flex:1" onclick="closeModal();document.body.classList.remove('preview-open')">Cancel</button>
               <button type="submit" id="bookingSubmitBtn" class="btn btn-primary" style="flex:1">Save Booking</button>
             </div>
           </form>
@@ -4146,6 +4146,7 @@ function openBookingForm(bookingId, presetDate, prefillData){
   `);
 
   const editingIdForBind = editing ? editing.id : '';
+  document.body.classList.add('preview-open');
   const formEl = document.getElementById('bookingForm');
   const submitBtnEl = document.getElementById('bookingSubmitBtn');
   if(formEl){
